@@ -1,0 +1,64 @@
+// vim: set ts=2 sw=2 tw=99 et:
+var VendorMap = {
+  '0x1013': 'Cirrus Logic',
+  '0x1002': 'AMD',
+  '0x8086': 'Intel',
+  '0x5333': 'S3 Graphics',
+  '0x1039': 'SIS',
+  '0x1106': 'VIA',
+  '0x10de': 'NVIDIA',
+  '0x102b': 'Matrox',
+};
+function LookupVendor(code)
+{
+  if (code in VendorMap)
+    return VendorMap[code];
+  return 'Unknown';
+}
+
+var MajorVendors = [
+  '0x8086',
+  '0x1002',
+  '0x10de',
+];
+
+var IsMajorVendor = function (vendor)
+{
+  for (var i = 0; i < MajorVendors.length; i++) {
+    if (MajorVendors[i]  == vendor)
+      return true;
+  }
+  return false;
+}
+
+var WindowsVersionMap = {
+  '5.1': 'Windows XP',
+  '5.2': 'Windows Server 2003',
+  '6.0': 'Windows Vista',
+  '6.1': 'Windows 7',
+  '6.2': 'Windows 8',
+  '6.3': 'Windows 8.1',
+  '10.0': 'Windows 10',
+};
+function WindowsVersionName(code)
+{
+  var parts = code.split('.');
+  if (parts.length < 2)
+    return 'Unknown';
+  var base = parts[0] + '.' + parts[1];
+  if (!(base in WindowsVersionMap))
+    return 'Unknown';
+  if (parts.length >= 3 && parseInt(parts[2]) != 0)
+    return WindowsVersionMap[base] + ' SP' + parts[2];
+  return WindowsVersionMap[base];
+}
+
+var DeviceResetReason = [
+  "OK",
+  "Hung",
+  "Removed",
+  "Reset",
+  "Driver error",
+  "Invalid Call",
+  "Out of memory",
+]

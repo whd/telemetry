@@ -15,6 +15,12 @@ function LookupVendor(code)
     return VendorMap[code];
   return 'Unknown';
 }
+function GetVendorName(code)
+{
+  if (code in VendorMap)
+    return VendorMap[code];
+  return 'Unknown vendor ' + code;
+}
 
 var MajorVendors = [
   '0x8086',
@@ -42,6 +48,8 @@ var WindowsVersionMap = {
 };
 function WindowsVersionName(code)
 {
+  if (code.indexOf("Windows-") == 0)
+    code = code.substr(8);
   var parts = code.split('.');
   if (parts.length < 2)
     return 'Unknown';
@@ -61,4 +69,30 @@ var DeviceResetReason = [
   "Driver error",
   "Invalid Call",
   "Out of memory",
-]
+];
+
+var SanityTestCodes = [
+  "Passed",
+  "Render failed",
+  "Video failed",
+  "Crashed",
+];
+
+function GetDeviceName(device)
+{
+  if (device in PCIDeviceMap)
+    return PCIDeviceMap[device];
+  var parts = device.split('/');
+  if (parts.length == 2)
+    return GetVendorName(parts[0]) + ' ' + parts[1];
+  return device;
+}
+
+function GetDriverName(driver)
+{
+  var parts = driver.split('/');
+  if (parts.length == 2)
+    return GetVendorName(parts[0]) + ' ' + parts[1];
+  return driver;
+}
+

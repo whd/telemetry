@@ -118,6 +118,9 @@ Controller.prototype.changeView = function (view)
     case 'tdrs':
       this.charts.drawTDRs();
       break;
+    case 'sanity':
+      this.charts.drawSanityTests();
+      break;
   }
 }
 

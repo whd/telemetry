@@ -147,7 +147,8 @@ ChartController.prototype.ensureData = function (key, callback)
   state.callbacks.push(callback);
 
   $.ajax({
-    url: 'data/' + key
+    url: 'data/' + key,
+    dataType: 'json',
   }).done(function (data) {
     state.obj = (typeof data == 'string')
                 ? JSON.parse(data)
@@ -286,6 +287,94 @@ ChartController.prototype.drawGeneral = function ()
     });
   }
   this.drawPieChart(elt, device_series);
+}
+
+ChartController.prototype.mapToSeries = function (input, namer)
+{
+  var series = [];
+  for (var key in input) {
+    series.push({
+      label: namer(key),
+      data: input[key],
+    });
+  }
+  return series;
+}
+
+ChartController.prototype.drawSanityTests = function ()
+{
+  var obj = this.ensureData('sanity-test-statistics.json', this.drawSanityTests.bind(this));
+  if (!obj)
+    return;
+
+  $("#viewport").append(
+      $("<p></p>").append(
+        $("<strong></strong>").text("Sample size: ")
+      ).append(
+        $("<span></span>").text(obj.totalSessions + " sessions")
+      ),
+      $("<p></p>").append(
+        $("<strong></strong>").text("Number of sanity tests attempted: ")
+      ).append(
+        $("<span></span>").text(obj.sanityTestPings)
+      )
+  );
+
+  for (var i = 0; i < obj.byOS.length; i++) {
+    var key = obj.byOS[i][0];
+    var data = obj.byOS[i][1];
+    var elt = this.prepareChartDiv(
+      'sanity-test-by-os-' + key,
+      SanityTestCodes[key] + ', by Operating System',
+      600, 300);
+    var series = this.mapToSeries(data,
+      function (key) {
+        return WindowsVersionName(key);
+      });
+    this.drawPieChart(elt, series);
+  }
+
+  for (var i = 0; i < obj.byVendor.length; i++) {
+    var key = obj.byVendor[i][0];
+    var data = obj.byVendor[i][1];
+    var elt = this.prepareChartDiv(
+      'sanity-test-by-vendor-' + key,
+      SanityTestCodes[key] + ', by Graphics Vendor',
+      600, 300);
+    var series = this.mapToSeries(data,
+      function (key) {
+        return GetVendorName(key);
+      });
+    this.drawPieChart(elt, series);
+  }
+
+  for (var i = 0; i < obj.byDevice.length; i++) {
+    var key = obj.byDevice[i][0];
+    var data = obj.byDevice[i][1];
+    var elt = this.prepareChartDiv(
+      'sanity-test-by-device-' + key,
+      SanityTestCodes[key] + ', by Graphics Device',
+      600, 300);
+    var series = this.mapToSeries(data,
+      function (key) {
+        return GetDeviceName(key);
+      });
+    this.drawPieChart(elt, series);
+  }
+
+  for (var i = 0; i < obj.byDriver.length; i++) {
+    var key = obj.byDriver[i][0];
+    var data = obj.byDriver[i][1];
+    var elt = this.prepareChartDiv(
+      'sanity-test-by-driver-' + key,
+      SanityTestCodes[key] + ', by Graphics Driver',
+      600, 300);
+    var series = this.mapToSeries(data,
+      function (key) {
+        return GetDriverName(key);
+      });
+    this.drawPieChart(elt, series);
+  }
 }
 
 ChartController.prototype.drawTDRs = function ()

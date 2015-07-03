@@ -319,11 +319,15 @@ ChartController.prototype.drawSanityTests = function ()
   if (!obj)
     return;
 
+  var sampleInfo = "uniform " +
+                   (obj.fraction * 100).toFixed(2) + "% " +
+                   "samples of Firefox 41 and 42, taken independently";
+
   $("#viewport").append(
       $("<p></p>").append(
         $("<strong></strong>").text("Sample size: ")
       ).append(
-        $("<span></span>").text(obj.totalSessions + " sessions")
+        $("<span></span>").text(obj.totalSessions + " sessions (" + sampleInfo + ")")
       ),
       $("<p></p>").append(
         $("<strong></strong>").text("Number of sanity tests attempted: ")

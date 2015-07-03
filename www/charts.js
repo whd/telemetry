@@ -407,8 +407,8 @@ ChartController.prototype.drawTDRs = function ()
     return;
 
   var totalTDRs = 0;
-  for (var i = 0; i < obj.tdrReasons.length; i++)
-    totalTDRs += obj.tdrReasons[i];
+  for (var i = 0; i < obj.results.length; i++)
+    totalTDRs += obj.results[i];
 
   var avgUsers = ((obj['tdrPings'] / obj['windowsPings']) * 100).toFixed(2);
   var avgTDRs = (totalTDRs / obj['tdrPings']).toFixed(1);
@@ -417,7 +417,7 @@ ChartController.prototype.drawTDRs = function ()
       $("<p></p>").append(
         $("<strong></strong>").text("Sample size: ")
       ).append(
-        $("<span></span>").text(obj.windowsUsers + " sessions")
+        $("<span></span>").text(obj.windowsPings + " sessions")
       ),
       $("<p></p>").append(
         $("<strong></strong>").text("Percentage of sessions with TDRs: ")
@@ -432,14 +432,11 @@ ChartController.prototype.drawTDRs = function ()
   );
 
   var elt = this.prepareChartDiv('tdr-reasons', 'TDR Reason Breakdown', 600, 300);
-  var tdrs = [];
-  for (var i = 1; i <= DeviceResetReason.length; i++) {
-    tdrs.push({
-      label: DeviceResetReason[i],
-      data: obj.tdrReasons[i],
+  var series = this.listToSeries(obj.results,
+    function (reason) {
+      return DeviceResetReason[reason];
     });
-  }
-  this.drawPieChart(elt, tdrs);
+  this.drawPieChart(elt, series);
 
   // Combine the TDR breakdown into a single map of vendor => count.
   var combinedMap = {};

@@ -320,8 +320,10 @@ ChartController.prototype.drawSanityTests = function ()
     return;
 
   var sampleInfo = "uniform " +
-                   (obj.fraction * 100).toFixed(2) + "% " +
-                   "samples of Firefox 41 and 42, taken independently";
+                   (obj.fraction * 100).toFixed(2) + "% of " +
+                   "all pings covering " +
+                   obj.timeWindow + " days, " +
+                   "for each of Firefox 41 and 42";
 
   $("#viewport").append(
       $("<p></p>").append(

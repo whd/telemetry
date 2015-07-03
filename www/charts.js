@@ -289,6 +289,18 @@ ChartController.prototype.drawGeneral = function ()
   this.drawPieChart(elt, device_series);
 }
 
+ChartController.prototype.listToSeries = function (input, namer)
+{
+  var series = [];
+  for (var i = 0; i < input.length; i++) {
+    series.push({
+      label: namer(i),
+      data: input[i],
+    });
+  }
+  return series;
+}
+
 ChartController.prototype.mapToSeries = function (input, namer)
 {
   var series = [];
@@ -320,12 +332,23 @@ ChartController.prototype.drawSanityTests = function ()
       )
   );
 
+  var elt = this.prepareChartDiv(
+    'sanity-test-results',
+    'Sanity test results',
+    600, 300);
+  var series = this.listToSeries(obj.results,
+    function (index) {
+      return SanityTestCode[index];
+    }
+  );
+  this.drawPieChart(elt, series);
+
   for (var i = 0; i < obj.byOS.length; i++) {
     var key = obj.byOS[i][0];
     var data = obj.byOS[i][1];
     var elt = this.prepareChartDiv(
       'sanity-test-by-os-' + key,
-      SanityTestCodes[key] + ', by Operating System',
+      SanityTestCode[key] + ', by Operating System',
       600, 300);
     var series = this.mapToSeries(data,
       function (key) {
@@ -339,7 +362,7 @@ ChartController.prototype.drawSanityTests = function ()
     var data = obj.byVendor[i][1];
     var elt = this.prepareChartDiv(
       'sanity-test-by-vendor-' + key,
-      SanityTestCodes[key] + ', by Graphics Vendor',
+      SanityTestCode[key] + ', by Graphics Vendor',
       600, 300);
     var series = this.mapToSeries(data,
       function (key) {
@@ -353,8 +376,8 @@ ChartController.prototype.drawSanityTests = function ()
     var data = obj.byDevice[i][1];
     var elt = this.prepareChartDiv(
       'sanity-test-by-device-' + key,
-      SanityTestCodes[key] + ', by Graphics Device',
-      600, 300);
+      SanityTestCode[key] + ', by Graphics Device',
+      800, 300);
     var series = this.mapToSeries(data,
       function (key) {
         return GetDeviceName(key);
@@ -367,7 +390,7 @@ ChartController.prototype.drawSanityTests = function ()
     var data = obj.byDriver[i][1];
     var elt = this.prepareChartDiv(
       'sanity-test-by-driver-' + key,
-      SanityTestCodes[key] + ', by Graphics Driver',
+      SanityTestCode[key] + ', by Graphics Driver',
       600, 300);
     var series = this.mapToSeries(data,
       function (key) {
@@ -387,7 +410,7 @@ ChartController.prototype.drawTDRs = function ()
   for (var i = 0; i < obj.tdrReasons.length; i++)
     totalTDRs += obj.tdrReasons[i];
 
-  var avgUsers = ((obj['tdrPings'] / obj['windowsUsers']) * 100).toFixed(2);
+  var avgUsers = ((obj['tdrPings'] / obj['windowsPings']) * 100).toFixed(2);
   var avgTDRs = (totalTDRs / obj['tdrPings']).toFixed(1);
 
   $("#viewport").append(
@@ -420,8 +443,8 @@ ChartController.prototype.drawTDRs = function ()
 
   // Combine the TDR breakdown into a single map of vendor => count.
   var combinedMap = {};
-  for (var i = 0; i < obj.tdrToVendor.length; i++) {
-    var item = obj.tdrToVendor[i];
+  for (var i = 0; i < obj.reasonToVendor.length; i++) {
+    var item = obj.reasonToVendor[i];
     var reason = item[0];
     var map = item[1];
 
@@ -474,8 +497,8 @@ ChartController.prototype.drawTDRs = function ()
   }
 
   // Draw a vendor pie chart for each TDR reason.
-  for (var i = 0; i < obj.tdrToVendor.length; i++) {
-    var item = obj.tdrToVendor[i];
+  for (var i = 0; i < obj.reasonToVendor.length; i++) {
+    var item = obj.reasonToVendor[i];
     var reason = item[0];
     var map = item[1];
 

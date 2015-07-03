@@ -71,7 +71,7 @@ var DeviceResetReason = [
   "Out of memory",
 ];
 
-var SanityTestCodes = [
+var SanityTestCode = [
   "Passed",
   "Render failed",
   "Video failed",

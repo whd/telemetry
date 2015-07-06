@@ -371,7 +371,7 @@ ChartController.prototype.drawTestCrashes = function ()
     $('#viewport').append(
       $("<p></p>").append(
         $("<strong></strong>").text("Date: "),
-        $("<span></span>").text(date.toLocaleFormat())
+        $("<span></span>").text(date.toLocaleDateString())
       )
     );
 

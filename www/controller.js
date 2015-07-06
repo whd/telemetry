@@ -121,6 +121,9 @@ Controller.prototype.changeView = function (view)
     case 'sanity':
       this.charts.drawSanityTests();
       break;
+    case 'testcrashes':
+      this.charts.drawTestCrashes();
+      break;
   }
 }
 

@@ -313,6 +313,123 @@ ChartController.prototype.mapToSeries = function (input, namer)
   return series;
 }
 
+ChartController.prototype.drawTestCrashes = function ()
+{
+  var obj = this.ensureData('sanity-test-crash-reports.json', this.drawTestCrashes.bind(this));
+  if (!obj)
+    return;
+
+  var sampleInfo = "uniform " +
+                   (obj.fraction * 100).toFixed(2) + "% of " +
+                   "all pings covering " +
+                   obj.timeWindow + " days, " +
+                   "for each of Firefox 41 and 42";
+  var sanityTestInfoText =
+    obj.sanityTestPings + " (" +
+    ((obj.sanityTestPings / obj.totalSessions) * 100).toFixed(2) + "% " +
+    "of sessions)";
+  var crashInfoText =
+    obj.reports.length + " (" +
+    ((obj.reports.length / obj.sanityTestPings) * 100).toFixed(2) + "% " +
+    "of sanity test runs)";
+
+  $("#viewport").append(
+      $("<p></p>").append(
+        $("<strong></strong>").text("Sample size: ")
+      ).append(
+        $("<span></span>").text(obj.totalSessions + " sessions (" + sampleInfo + ")")
+      ),
+      $("<p></p>").append(
+        $("<strong></strong>").text("Number of sanity tests attempted: ")
+      ).append(
+        $("<span></span>").text(sanityTestInfoText)
+      ),
+      $("<p></p>").append(
+        $("<strong></strong>").text("Number of sanity test crashes: ")
+      ).append(
+        $("<span></span>").text(crashInfoText)
+      )
+  );
+
+  var reports = obj.reports.slice(0);
+  for (var i = 0; i < reports; i++) {
+    if (reports[i].timestamp || !reports[i].date)
+      continue;
+    reports[i].timestamp = Date.parse(reports[i].date);
+  }
+  reports.sort(function (a, b) {
+    return b.timestamp - a.timestamp;
+  });
+
+  $('#viewport').append(
+    $("<h2></h2>").text("Crash Reports")
+  );
+
+  for (var i = 0; i < reports.length; i++) {
+    var report = reports[i];
+    var date = new Date(report.date);
+    $('#viewport').append(
+      $("<p></p>").append(
+        $("<strong></strong>").text("Date: "),
+        $("<span></span>").text(date.toLocaleFormat())
+      )
+    );
+
+    var ul = $('<ul></ul>');
+
+    var ostext = (report.os.name in OSMap
+                 ? OSMap[report.os.name]
+                 : report.os.name);
+    if (report.os.version) {
+      ostext += " " + report.os.version;
+      if (report.os.servicePack)
+        ostext += " (SP " + report.os.servicePack + ")";
+    } else {
+      ostext += " (unknown version)";
+    }
+    ul.append($('<li></li>').text("Operating System: " + ostext));
+
+    var build = $('<li></li>').text("Build:");
+    build.append(
+      $('<ul></ul>').append(
+        $('<li></li>').text('Version: ' + report.build.version),
+        $('<li></li>').text('Revision: ').append(
+          $('<a>').text(report.build.revision)
+                  .attr('href', report.build.revision)
+        )
+      )
+    );
+    ul.append(build);
+
+    var adapter = $('<ul></ul>');
+    var vendorText = report.adapter.vendorID;
+    if (report.adapter.vendorID in VendorMap)
+      vendorText += " (" + VendorMap[report.adapter.vendorID] + ")";
+    else
+      vendorText += " (unknown vendor)";
+    var deviceText = report.adapter.deviceID;
+    var fullDeviceID = report.adapter.vendorID + "/" + report.adapter.deviceID;
+    if (fullDeviceID in PCIDeviceMap)
+      deviceText += " (" + PCIDeviceMap[fullDeviceID] + ")";
+    else
+      deviceText += " (not in PCI database)";
+
+    adapter.append(
+      $('<li></li>').text('Description: ' + report.adapter.description),
+      $('<li></li>').text('Vendor: ' + vendorText),
+      $('<li></li>').text('Device: ' + deviceText),
+      $('<li></li>').text('Driver: ' +
+                           report.adapter.driverVersion +
+                           ' (date: ' + report.adapter.driverDate + ')'),
+      $('<li></li>').text('Subsystem ID: ' + report.adapter.subsysID),
+      $('<li></li>').text('RAM: ' + (report.adapter.RAM ? report.adapter.RAM : "unknown"))
+    );
+    ul.append($('<li></li>').text('Adapter:').append(adapter));
+
+    $('#viewport').append(ul);
+  }
+}
+
 ChartController.prototype.drawSanityTests = function ()
 {
   var obj = this.ensureData('sanity-test-statistics.json', this.drawSanityTests.bind(this));

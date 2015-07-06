@@ -22,6 +22,11 @@ function GetVendorName(code)
   return 'Unknown vendor ' + code;
 }
 
+var OSMap = {
+  'Windows_NT': 'Windows',
+  'Darwin': 'Mac OS X',
+};
+
 var MajorVendors = [
   '0x8086',
   '0x1002',

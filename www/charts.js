@@ -351,11 +351,13 @@ ChartController.prototype.drawTestCrashes = function ()
       )
   );
 
-  var reports = obj.reports.slice(0);
-  for (var i = 0; i < reports; i++) {
-    if (reports[i].timestamp || !reports[i].date)
+  var reports = [];
+  for (var i = 0; i < obj.reports.length; i++) {
+    if (!obj.reports[i].date)
       continue;
-    reports[i].timestamp = Date.parse(reports[i].date);
+    if (!obj.reports[i].timestamp)
+      obj.reports[i].timestamp = Date.parse(obj.reports[i].date);
+    reports.push(obj.reports[i]);
   }
   reports.sort(function (a, b) {
     return b.timestamp - a.timestamp;

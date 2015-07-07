@@ -8,6 +8,8 @@ var VendorMap = {
   '0x1106': 'VIA',
   '0x10de': 'NVIDIA',
   '0x102b': 'Matrox',
+  '0x15ad': 'VMWare',
+  '0x80ee': 'Oracle VirtualBox',
 };
 function LookupVendor(code)
 {

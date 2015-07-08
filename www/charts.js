@@ -313,51 +313,15 @@ ChartController.prototype.mapToSeries = function (input, namer)
   return series;
 }
 
-ChartController.prototype.drawTestCrashes = function ()
+ChartController.prototype.drawCrashReports = function (inReports)
 {
-  var obj = this.ensureData('sanity-test-crash-reports.json', this.drawTestCrashes.bind(this));
-  if (!obj)
-    return;
-
-  var sampleInfo = "uniform " +
-                   (obj.fraction * 100).toFixed(2) + "% of " +
-                   "all pings covering " +
-                   obj.timeWindow + " days, " +
-                   "for each of Firefox 41 and 42";
-  var sanityTestInfoText =
-    obj.sanityTestPings + " (" +
-    ((obj.sanityTestPings / obj.totalSessions) * 100).toFixed(2) + "% " +
-    "of sessions)";
-  var crashInfoText =
-    obj.reports.length + " (" +
-    ((obj.reports.length / obj.sanityTestPings) * 100).toFixed(2) + "% " +
-    "of sanity test runs)";
-
-  $("#viewport").append(
-      $("<p></p>").append(
-        $("<strong></strong>").text("Sample size: ")
-      ).append(
-        $("<span></span>").text(obj.totalSessions + " sessions (" + sampleInfo + ")")
-      ),
-      $("<p></p>").append(
-        $("<strong></strong>").text("Number of sanity tests attempted: ")
-      ).append(
-        $("<span></span>").text(sanityTestInfoText)
-      ),
-      $("<p></p>").append(
-        $("<strong></strong>").text("Number of sanity test crashes: ")
-      ).append(
-        $("<span></span>").text(crashInfoText)
-      )
-  );
-
   var reports = [];
-  for (var i = 0; i < obj.reports.length; i++) {
-    if (!obj.reports[i].date)
+  for (var i = 0; i < inReports.length; i++) {
+    if (!inReports[i].date)
       continue;
-    if (!obj.reports[i].timestamp)
-      obj.reports[i].timestamp = Date.parse(obj.reports[i].date);
-    reports.push(obj.reports[i]);
+    if (!inReports[i].timestamp)
+      inReports[i].timestamp = Date.parse(inReports[i].date);
+    reports.push(inReports[i]);
   }
   reports.sort(function (a, b) {
     return b.timestamp - a.timestamp;
@@ -430,6 +394,90 @@ ChartController.prototype.drawTestCrashes = function ()
 
     $('#viewport').append(ul);
   }
+}
+
+ChartController.prototype.drawStartupData = function ()
+{
+  var obj = this.ensureData('startup-test-statistics.json', this.drawStartupData.bind(this));
+  if (!obj)
+    return;
+
+  var sampleInfo = "uniform " +
+                   (obj.fraction * 100).toFixed(2) + "% of " +
+                   "all pings covering " +
+                   obj.timeWindow + " days, " +
+                   "for each of Firefox 41 and 42";
+  var sanityTestInfoText =
+    obj.startupTestPings + " (" +
+    ((obj.startupTestPings / obj.totalSessions) * 100).toFixed(2) + "% " +
+    "of sessions)";
+
+  $("#viewport").append(
+      $("<p></p>").append(
+        $("<strong></strong>").text("Sample size: ")
+      ).append(
+        $("<span></span>").text(obj.totalSessions + " sessions (" + sampleInfo + ")")
+      ),
+      $("<p></p>").append(
+        $("<strong></strong>").text("Number of sessions with startup guards: ")
+      ).append(
+        $("<span></span>").text(sanityTestInfoText)
+      )
+  );
+
+  var elt = this.prepareChartDiv(
+    'startup-test-results',
+    'Sanity test results',
+    600, 300);
+  var series = this.listToSeries(obj.results,
+    function (index) {
+      return StartupTestCode[index];
+    }
+  );
+  this.drawPieChart(elt, series);
+
+  this.drawCrashReports(obj.reports);
+}
+
+ChartController.prototype.drawTestCrashes = function ()
+{
+  var obj = this.ensureData('sanity-test-crash-reports.json', this.drawTestCrashes.bind(this));
+  if (!obj)
+    return;
+
+  var sampleInfo = "uniform " +
+                   (obj.fraction * 100).toFixed(2) + "% of " +
+                   "all pings covering " +
+                   obj.timeWindow + " days, " +
+                   "for each of Firefox 41 and 42";
+  var sanityTestInfoText =
+    obj.sanityTestPings + " (" +
+    ((obj.sanityTestPings / obj.totalSessions) * 100).toFixed(2) + "% " +
+    "of sessions)";
+  var crashInfoText =
+    obj.reports.length + " (" +
+    ((obj.reports.length / obj.sanityTestPings) * 100).toFixed(2) + "% " +
+    "of sanity test runs)";
+
+  $("#viewport").append(
+      $("<p></p>").append(
+        $("<strong></strong>").text("Sample size: ")
+      ).append(
+        $("<span></span>").text(obj.totalSessions + " sessions (" + sampleInfo + ")")
+      ),
+      $("<p></p>").append(
+        $("<strong></strong>").text("Number of sanity tests attempted: ")
+      ).append(
+        $("<span></span>").text(sanityTestInfoText)
+      ),
+      $("<p></p>").append(
+        $("<strong></strong>").text("Number of sanity test crashes: ")
+      ).append(
+        $("<span></span>").text(crashInfoText)
+      )
+  );
+
+  this.drawCrashReports(obj.reports);
 }
 
 ChartController.prototype.drawSanityTests = function ()

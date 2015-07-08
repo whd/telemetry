@@ -84,6 +84,12 @@ var SanityTestCode = [
   "Video failed",
   "Crashed",
 ];
+var StartupTestCode = [
+  "Ok",
+  "Environment Changed",
+  "Crash detected",
+  "Acceleration disabled from crash"
+];
 
 function GetDeviceName(device)
 {

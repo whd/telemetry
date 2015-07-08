@@ -229,7 +229,7 @@ ChartController.prototype.drawGeneral = function ()
       $("<p></p>").append(
         $("<strong></strong>").text("Sample size: ")
       ).append(
-        $("<span></span>").text(obj.totalPings + " sessions (uniform " + samplePercent + "% of all samples)")
+        $("<span></span>").text(obj.validPings + " sessions (uniform " + samplePercent + "% of all sessions)")
       )
   );
 

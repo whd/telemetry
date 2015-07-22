@@ -109,3 +109,20 @@ function GetDriverName(driver)
   return driver;
 }
 
+var D3D11StatusCode = {
+  0x9100: 'FEATURE_LEVEL_9_1',
+  0x9200: 'FEATURE_LEVEL_9_2',
+  0x9300: 'FEATURE_LEVEL_9_3',
+  0xA000: 'FEATURE_LEVEL_10_0',
+  0xA100: 'FEATURE_LEVEL_10_1',
+  0xB000: 'FEATURE_LEVEL_11_0',
+  0xB100: 'FEATURE_LEVEL_11_1',
+  0xC000: 'FEATURE_LEVEL_12_0',
+  0xC100: 'FEATURE_LEVEL_12_1',
+  'warp': 'WARP (any feature level)',
+};
+
+var D2DStatusCode = {
+  '1.0': 'Direct2D 1.0',
+  '1.1': 'Direct2D 1.1',
+};

@@ -127,6 +127,9 @@ Controller.prototype.changeView = function (view)
     case 'startup':
       this.charts.drawStartupData();
       break;
+    case 'windows-features':
+      this.charts.drawWindowsFeatures();
+      break;
   }
 }
 

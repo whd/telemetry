@@ -396,6 +396,68 @@ ChartController.prototype.drawCrashReports = function (inReports)
   }
 }
 
+ChartController.prototype.drawWindowsFeatures = function ()
+{
+  var obj = this.ensureData('windows-features.json', this.drawWindowsFeatures.bind(this));
+  if (!obj)
+    return;
+
+  $("#viewport").append(
+      $("<p></p>").append(
+        $("<strong></strong>").text("Sample size: ")
+      ).append(
+        $("<span></span>").text(obj.featurePings + " sessions")
+      )
+  );
+
+  var elt = this.prepareChartDiv(
+    'compositors',
+    'Windows Compositor Usage',
+    600, 300);
+  var series = this.mapToSeries(obj.compositors,
+    function (key) {
+      return key;
+    });
+  this.drawPieChart(elt, series);
+
+  // We don't care about the 'unused' status.
+  delete obj.d3d11['unused'];
+
+  var elt = this.prepareChartDiv(
+    'd3d11-breakdown',
+    'Direct3D11 Support',
+    600, 300);
+  var series = this.mapToSeries(obj.d3d11,
+    function (key) {
+      if (key in D3D11StatusCode)
+        return D3D11StatusCode[key];
+      return key.charAt(0).toUpperCase() + key.substring(1);
+    });
+  this.drawPieChart(elt, series);
+
+  var elt = this.prepareChartDiv(
+    'd2d-breakdown',
+    'Direct2D Support',
+    600, 300);
+  var series = this.mapToSeries(obj.d2d,
+    function (key) {
+      if (key in D2DStatusCode)
+        return D2DStatusCode[key];
+      return key.charAt(0).toUpperCase() + key.substring(1);
+    });
+  this.drawPieChart(elt, series);
+
+  var elt = this.prepareChartDiv(
+    'texture-sharing-breakdown',
+    'Direct3D11 Texture Sharing',
+    600, 300);
+  var series = this.mapToSeries(obj.textureSharing,
+    function (key) {
+      return (key == "true") ? "Works" : "Doesn't work";
+    });
+  this.drawPieChart(elt, series);
+}
+
 ChartController.prototype.drawStartupData = function ()
 {
   var obj = this.ensureData('startup-test-statistics.json', this.drawStartupData.bind(this));

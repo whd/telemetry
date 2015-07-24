@@ -36,22 +36,29 @@ Controller.prototype.addFilter = function (id, title, options, callback, default
   var chooser = $('<select></select>', { id: id });
   elt.append(chooser);
 
+  $("#filters").append(elt);
+
   for (var i = 0; i < options.length; i++) {
     chooser.append($('<option></option>', {
       value: options[i].value
     }).text(options[i].text));
   }
 
-  this.registerParam(id, function () {
-    callback(chooser);
-  });
+  this.registerParam(id, callback);
 
   chooser.val(this.getParam(id, defaultValue));
+
+  chooser.change((function () {
+    this.updateHash(id, chooser.val());
+    callback();
+  }).bind(this));
 
   this.filters.push({
     elt: elt,
     id: id,
   });
+
+  return chooser;
 }
 
 // Invoked when the URL changes.
@@ -73,6 +80,9 @@ Controller.prototype.onHashChange = function ()
   }
 
   var view = this.getParam('view', 'general');
+  if (this.view == view)
+    return;
+
   this.changeView(view);
 }
 
@@ -93,12 +103,14 @@ Controller.prototype.updateHash = function (key, val)
   }
 }
 
+Controller.prototype.refresh = function ()
+{
+  this.changeView($('#viewchooser').val());
+}
+
 // Change the top-level view of the page.
 Controller.prototype.changeView = function (view)
 {
-  if (this.view == view)
-    return;
-
   $("#viewChooser").val(view);
   $("#viewport").empty();
   this.charts.clear();
@@ -129,6 +141,9 @@ Controller.prototype.changeView = function (view)
       break;
     case 'windows-features':
       this.charts.drawWindowsFeatures();
+      break;
+    case 'monitors':
+      this.charts.drawMonitors();
       break;
   }
 }

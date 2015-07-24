@@ -169,20 +169,27 @@ ChartController.prototype.reduce = function (data, combineKey, threshold, callba
   for (var key in data)
     total += data[key];
 
+  var copy = {};
+  if (combineKey in data)
+    copy[combineKey] = data[combineKey];
+
   for (var key in data) {
-    if (callback(key) && (data[key] / total >= threshold))
-      continue;
-    data[combineKey] = (data[combineKey] | 0) + data[key];
-    delete data[key];
+    if ((!callback || callback(key)) && (data[key] / total >= threshold))
+      copy[key] = data[key];
+    else if (key != combineKey)
+      copy[combineKey] = (copy[combineKey] | 0) + data[key];
   }
+  return copy;
 }
 
-ChartController.prototype.createOptionList = function (elt, map, namer)
+ChartController.prototype.createOptionList = function (map, namer)
 {
   var list = [];
   for (var key in map)
-    list.push(namer ? namer(key) : key);
-  list.sort(function (a, b) {
+    list.push([key, namer ? namer(key) : key]);
+  list.sort(function (item1, item2) {
+    var a = item1[1];
+    var b = item2[1];
     if (a < b)
       return -1;
     if (a > b)
@@ -190,48 +197,83 @@ ChartController.prototype.createOptionList = function (elt, map, namer)
     return 0;
   });
 
+  var options = [];
   for (var i = 0; i < list.length; i++) {
-    elt.append($('<option></option>', {
-      value: list[i],
-    }).text(list[i]));
+    options.push({
+      value: list[i][0],
+      text: list[i][1],
+    });
   }
+  return options;
 }
 
-ChartController.prototype.getGeneralData = function (callback)
+ChartController.prototype.listToSeries = function (input, namer)
 {
-  var ready = this.ensureData('general-statistics.json', (function (obj) {
-    this.reduce(obj['vendors'], 'Unknown', 0, function(key) {
-      return key in VendorMap;
+  var series = [];
+  for (var i = 0; i < input.length; i++) {
+    series.push({
+      label: namer(i),
+      data: input[i],
     });
-    this.reduce(obj['windows'], 'Other', 0.005, function(key) {
-      return WindowsVersionName(key) != 'Unknown';
+  }
+  return series;
+};
+
+ChartController.prototype.mapToSeries = function (input, namer)
+{
+  var series = [];
+  for (var key in input) {
+    series.push({
+      label: namer(key),
+      data: input[key],
     });
+  }
+  return series;
+};
 
-    // Setup the filter lists.
-    //this.createOptionList(this.app.getFilter('fx'), obj['firefox']);
-    //this.createOptionList(this.app.getFilter('win'), obj['windows'], WindowsVersionName);
-    //this.app.getFilter('fx').val(this.app.getParam('fx', '*'));
-    //this.app.getFilter('win').val(this.app.getParam('win', '*'));
-    callback();
-  }).bind(this));
-
-  return ready;
+ChartController.prototype.toPercent = function (val)
+{
+  return parseFloat((val * 100).toFixed(2));
 }
 
-ChartController.prototype.drawGeneral = function ()
+ChartController.prototype.drawSampleInfo = function (obj)
 {
-  var obj = this.getGeneralData(this.drawGeneral.bind(this));
-  if (!obj)
-    return;
+  var count = obj.sessions.count;
+  var days = obj.sessions.days;
+  var fraction = obj.sessions.fraction;
+  var channels = obj.sessions.channels
+                 ? (Array.isArray(obj.sessions.channels)
+                    ? (obj.sessions.channels.join(', ') + ' channels')
+                    : obj.sessions.channels)
+                 : 'all channels';
 
-  var samplePercent = (obj.pingFraction * 100).toFixed(1);
+  var sourceText = channels + ", " +
+                   parseFloat((fraction * 100).toFixed(2)) + "% sample rate, " + 
+                   "over " + days + " days, taken on " + 
+                   (new Date(obj.sessions.timestamp * 1000)).toLocaleDateString();
+
+
   $("#viewport").append(
       $("<p></p>").append(
         $("<strong></strong>").text("Sample size: ")
       ).append(
-        $("<span></span>").text(obj.validPings + " sessions (uniform " + samplePercent + "% of all sessions)")
+        $("<span></span>").text(count + " sessions")
+      ),
+      $("<p></p>").append(
+        $("<strong></strong>").text("Sample source: ")
+      ).append(
+        $("<span></span>").text(sourceText)
       )
   );
+};
+
+ChartController.prototype.drawGeneral = function ()
+{
+  var obj = this.ensureData('general-statistics.json', this.drawGeneral.bind(this));
+  if (!obj)
+    return;
+
+  this.drawSampleInfo(obj);
 
   var elt = this.prepareChartDiv('os-share', 'Operating System Usage', 600, 300);
   var oses = obj['os'];
@@ -240,6 +282,13 @@ ChartController.prototype.drawGeneral = function ()
       { label: "Linux", data: parseInt(oses['Linux']) },
       { label: "OS X", data: parseInt(oses['Darwin']) },
   ]);
+
+  var vendors = this.reduce(obj['vendors'], 'Unknown', 0, function(key) {
+    return key in VendorMap;
+  });
+  var windows = this.reduce(obj['windows'], 'Other', 0.01, function(key) {
+    return WindowsVersionName(key) != 'Unknown';
+  });
 
   var elt = this.prepareChartDiv('fx-share', 'Firefox Version Usage', 600, 300);
   var fx_series = [];
@@ -253,64 +302,37 @@ ChartController.prototype.drawGeneral = function ()
 
   var elt = this.prepareChartDiv('vendor-share', 'Device Vendor Usage', 600, 300);
   var vendor_series = [];
-  for (var vendor in obj['vendors']) {
+  for (var vendor in vendors) {
     vendor_series.push({
       label: LookupVendor(vendor),
-      data: obj['vendors'][vendor],
+      data: vendors[vendor],
     });
   }
   this.drawPieChart(elt, vendor_series);
 
   var elt = this.prepareChartDiv('winver-share', 'Windows Usage', 700, 500);
   var winver_series = [];
-  for (var winver in obj['windows']) {
+  for (var winver in windows) {
     winver_series.push({
       label: WindowsVersionName(winver),
-      data: obj['windows'][winver],
+      data: windows[winver],
     });
   }
   this.drawPieChart(elt, winver_series);
 
-  var devices_copy = {};
-  for (var key in obj['devices'])
-    devices_copy[key] = obj['devices'][key];
-  this.reduce(devices_copy, 'Other', 0.005, function (key) {
+  var devices = this.reduce(obj.devices, 'Other', 0.005, function (key) {
     return key in PCIDeviceMap;
   });
 
   var elt = this.prepareChartDiv('device-share', 'Devices', 1000, 600);
   var device_series = [];
-  for (var device in devices_copy) {
+  for (var device in devices) {
     device_series.push({
       label: PCIDeviceMap[device] || "Other",
-      data: devices_copy[device],
+      data: devices[device],
     });
   }
   this.drawPieChart(elt, device_series);
-}
-
-ChartController.prototype.listToSeries = function (input, namer)
-{
-  var series = [];
-  for (var i = 0; i < input.length; i++) {
-    series.push({
-      label: namer(i),
-      data: input[i],
-    });
-  }
-  return series;
-}
-
-ChartController.prototype.mapToSeries = function (input, namer)
-{
-  var series = [];
-  for (var key in input) {
-    series.push({
-      label: namer(key),
-      data: input[key],
-    });
-  }
-  return series;
 }
 
 ChartController.prototype.drawCrashReports = function (inReports)
@@ -394,7 +416,77 @@ ChartController.prototype.drawCrashReports = function (inReports)
 
     $('#viewport').append(ul);
   }
-}
+};
+
+ChartController.prototype.drawMonitors = function ()
+{
+  var obj = this.ensureData('monitor-statistics.json', this.drawMonitors.bind(this));
+  if (!obj)
+    return;
+
+  this.drawSampleInfo(obj);
+
+  var counts = this.reduce(obj.counts, 'Other', 0.005);
+  var refreshRates = this.reduce(obj.refreshRates, 'Other', 0.01);
+  var resolutions = this.reduce(obj.resolutions, 'Other', 0.01);
+
+  var largest_width = 0;
+  var largest_height = 0;
+  var largest_total = 0, largest_total_str;
+  for (var resolution in resolutions) {
+    var tuple = resolution.split('x');
+    if (tuple.length != 2)
+      continue;
+    if (parseInt(tuple[0]) > largest_width)
+      largest_width = parseInt(tuple[0]);
+    if (parseInt(tuple[1]) > largest_height)
+      largest_height = parseInt(tuple[1]);
+    var pixels = parseInt(tuple[0]) * parseInt(tuple[1]);
+    if (pixels > largest_total) {
+      largest_total = pixels;
+      largest_total_str = resolution;
+    }
+  }
+
+  var res_text = largest_total_str + " " +
+                 "(largest width: " + largest_width + ", " +
+                 "largest height: " + largest_height + ")";
+
+  $('#viewport').append(
+    $("<p></p>").append(
+      $("<strong></strong>").text("Largest resolution "),
+      $("<span></span>").text(res_text)
+    )
+  );
+
+  var elt = this.prepareChartDiv('monitor-counts', 'Number of Monitors', 600, 300);
+  var series = this.mapToSeries(counts,
+    function (key) {
+      if (parseInt(key))
+        return key + " monitor" + ((key > 1) ? "s" : "");
+      return key;
+    }
+  );
+  this.drawPieChart(elt, series);
+
+  var elt = this.prepareChartDiv('refresh-rates', 'Refresh Rates', 600, 300);
+  var series = this.mapToSeries(refreshRates,
+    function (key) {
+      if (parseInt(key))
+        return key + 'hz';
+      return key;
+    }
+  );
+  this.drawPieChart(elt, series);
+
+  var elt = this.prepareChartDiv('resolutions', 'Resolutions', 600, 300);
+  var series = this.mapToSeries(resolutions,
+    function (key) {
+      return key;
+    }
+  );
+  this.drawPieChart(elt, series);
+};
 
 ChartController.prototype.drawWindowsFeatures = function ()
 {
@@ -402,32 +494,78 @@ ChartController.prototype.drawWindowsFeatures = function ()
   if (!obj)
     return;
 
-  $("#viewport").append(
+  var options = this.createOptionList(obj.byVersion, WindowsVersionName);
+  options.unshift({
+    value: 'all',
+    text: 'All',
+  });
+  var filter = this.app.addFilter(
+    'winver',
+    'Windows Version',
+    options,
+    this.app.refresh.bind(this.app),
+    'all');
+
+  this.drawSampleInfo(obj);
+
+  var source;
+  if (filter.val() == 'all') {
+    source = obj.all;
+
+    // When there is no filter, draw a general Windows breakdown for this
+    // data set to help users narrow down the filter further.
+    var elt = this.prepareChartDiv(
+      'windows-versions',
+      'Windows Versions',
+      600, 300);
+
+    var winvers = {};
+    for (var key in obj.byVersion)
+      winvers[key] = obj.byVersion[key].count;
+    winvers = this.reduce(winvers, 'Other', 0.01, function(key) {
+      return WindowsVersionName(key) != 'Unknown';
+    });
+
+    var series = this.mapToSeries(winvers, WindowsVersionName);
+    this.drawPieChart(elt, series);
+  } else {
+    source = obj.byVersion[filter.val()];
+
+    var info_leader = WindowsVersionName(filter.val()) + " sessions:";
+    var info_text = " " + source.count +
+                    " (" +
+                    this.toPercent(source.count / obj.sessions.count) + "% of sessions)";
+
+    $('#viewport').append(
       $("<p></p>").append(
-        $("<strong></strong>").text("Sample size: ")
-      ).append(
-        $("<span></span>").text(obj.featurePings + " sessions")
+        $("<strong></strong>").text(info_leader),
+        $("<span></span>").text(info_text)
       )
-  );
+    );
+  }
 
   var elt = this.prepareChartDiv(
     'compositors',
-    'Windows Compositor Usage',
+    'Compositor Usage',
     600, 300);
-  var series = this.mapToSeries(obj.compositors,
+  var series = this.mapToSeries(source.compositors,
     function (key) {
       return key;
     });
   this.drawPieChart(elt, series);
 
+  // Everything else is Windows Vista+.
+  if (!('d3d11' in source))
+    return;
+
   // We don't care about the 'unused' status.
-  delete obj.d3d11['unused'];
+  delete source.d3d11['unused'];
 
   var elt = this.prepareChartDiv(
     'd3d11-breakdown',
     'Direct3D11 Support',
     600, 300);
-  var series = this.mapToSeries(obj.d3d11,
+  var series = this.mapToSeries(source.d3d11,
     function (key) {
       if (key in D3D11StatusCode)
         return D3D11StatusCode[key];
@@ -439,7 +577,7 @@ ChartController.prototype.drawWindowsFeatures = function ()
     'd2d-breakdown',
     'Direct2D Support',
     600, 300);
-  var series = this.mapToSeries(obj.d2d,
+  var series = this.mapToSeries(source.d2d,
     function (key) {
       if (key in D2DStatusCode)
         return D2DStatusCode[key];
@@ -451,7 +589,7 @@ ChartController.prototype.drawWindowsFeatures = function ()
     'texture-sharing-breakdown',
     'Direct3D11 Texture Sharing',
     600, 300);
-  var series = this.mapToSeries(obj.textureSharing,
+  var series = this.mapToSeries(source.textureSharing,
     function (key) {
       return (key == "true") ? "Works" : "Doesn't work";
     });
@@ -464,22 +602,14 @@ ChartController.prototype.drawStartupData = function ()
   if (!obj)
     return;
 
-  var sampleInfo = "uniform " +
-                   (obj.fraction * 100).toFixed(2) + "% of " +
-                   "all pings covering " +
-                   obj.timeWindow + " days, " +
-                   "for each of Firefox 41 and 42";
+  this.drawSampleInfo(obj);
+
   var sanityTestInfoText =
     obj.startupTestPings + " (" +
-    ((obj.startupTestPings / obj.totalSessions) * 100).toFixed(2) + "% " +
+    this.toPercent(obj.startupTestPings / obj.sessions.count) + "% " +
     "of sessions)";
 
   $("#viewport").append(
-      $("<p></p>").append(
-        $("<strong></strong>").text("Sample size: ")
-      ).append(
-        $("<span></span>").text(obj.totalSessions + " sessions (" + sampleInfo + ")")
-      ),
       $("<p></p>").append(
         $("<strong></strong>").text("Number of sessions with startup guards: ")
       ).append(
@@ -507,26 +637,18 @@ ChartController.prototype.drawTestCrashes = function ()
   if (!obj)
     return;
 
-  var sampleInfo = "uniform " +
-                   (obj.fraction * 100).toFixed(2) + "% of " +
-                   "all pings covering " +
-                   obj.timeWindow + " days, " +
-                   "for each of Firefox 41 and 42";
+  this.drawSampleInfo(obj);
+
   var sanityTestInfoText =
     obj.sanityTestPings + " (" +
-    ((obj.sanityTestPings / obj.totalSessions) * 100).toFixed(2) + "% " +
+    this.toPercent(obj.sanityTestPings / obj.sessions.count) + "% " +
     "of sessions)";
   var crashInfoText =
     obj.reports.length + " (" +
-    ((obj.reports.length / obj.sanityTestPings) * 100).toFixed(2) + "% " +
+    this.toPercent(obj.reports.length / obj.sanityTestPings) + "% " +
     "of sanity test runs)";
 
   $("#viewport").append(
-      $("<p></p>").append(
-        $("<strong></strong>").text("Sample size: ")
-      ).append(
-        $("<span></span>").text(obj.totalSessions + " sessions (" + sampleInfo + ")")
-      ),
       $("<p></p>").append(
         $("<strong></strong>").text("Number of sanity tests attempted: ")
       ).append(
@@ -548,22 +670,16 @@ ChartController.prototype.drawSanityTests = function ()
   if (!obj)
     return;
 
-  var sampleInfo = "uniform " +
-                   (obj.fraction * 100).toFixed(2) + "% of " +
-                   "all pings covering " +
-                   obj.timeWindow + " days, " +
-                   "for each of Firefox 41 and 42";
+  this.drawSampleInfo(obj);
+
+  var infoText = obj.sanityTestPings + " (" +
+                 this.toPercent(obj.sanityTestPings / obj.sessions.count) + "% of sessions)";
 
   $("#viewport").append(
       $("<p></p>").append(
-        $("<strong></strong>").text("Sample size: ")
-      ).append(
-        $("<span></span>").text(obj.totalSessions + " sessions (" + sampleInfo + ")")
-      ),
-      $("<p></p>").append(
         $("<strong></strong>").text("Number of sanity tests attempted: ")
       ).append(
-        $("<span></span>").text(obj.sanityTestPings)
+        $("<span></span>").text(infoText)
       )
   );
 
@@ -641,19 +757,16 @@ ChartController.prototype.drawTDRs = function ()
   if (!obj)
     return;
 
+  this.drawSampleInfo(obj);
+
   var totalTDRs = 0;
   for (var i = 0; i < obj.results.length; i++)
     totalTDRs += obj.results[i];
 
-  var avgUsers = ((obj['tdrPings'] / obj['windowsPings']) * 100).toFixed(2);
+  var avgUsers = ((obj['tdrPings'] / obj.sessions.count) * 100).toFixed(2);
   var avgTDRs = (totalTDRs / obj['tdrPings']).toFixed(1);
 
   $("#viewport").append(
-      $("<p></p>").append(
-        $("<strong></strong>").text("Sample size: ")
-      ).append(
-        $("<span></span>").text(obj.windowsPings + " sessions")
-      ),
       $("<p></p>").append(
         $("<strong></strong>").text("Percentage of sessions with TDRs: ")
       ).append(

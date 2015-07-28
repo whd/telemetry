@@ -182,6 +182,17 @@ ChartController.prototype.reduce = function (data, combineKey, threshold, callba
   return copy;
 }
 
+// Re-aggregate a dictionary based on a key transformation.
+ChartController.prototype.reaggregate = function (data, keyfn)
+{
+  var out = {};
+  for (var key in data) {
+    var new_key = keyfn(key);
+    out[new_key] = (out[new_key] | 0) + data[key];
+  }
+  return out;
+}
+
 ChartController.prototype.createOptionList = function (map, namer)
 {
   var list = [];
@@ -224,7 +235,7 @@ ChartController.prototype.mapToSeries = function (input, namer)
   var series = [];
   for (var key in input) {
     series.push({
-      label: namer(key),
+      label: namer ? namer(key) : key,
       data: input[key],
     });
   }
@@ -320,18 +331,22 @@ ChartController.prototype.drawGeneral = function ()
   }
   this.drawPieChart(elt, winver_series);
 
-  var devices = this.reduce(obj.devices, 'Other', 0.005, function (key) {
-    return key in PCIDeviceMap;
+  var dev_gen = this.reaggregate(obj.devices, function (key) {
+    return DeviceKeyToPropKey(key, 'gen');
   });
+  dev_gen = this.reduce(dev_gen, 'Other', 0.005);
 
-  var elt = this.prepareChartDiv('device-share', 'Devices', 1000, 600);
-  var device_series = [];
-  for (var device in devices) {
-    device_series.push({
-      label: PCIDeviceMap[device] || "Other",
-      data: devices[device],
-    });
-  }
+  var elt = this.prepareChartDiv('device-gen', 'Device Generations', 1000, 600);
+  var device_series = this.mapToSeries(dev_gen);
+  this.drawPieChart(elt, device_series);
+
+  var dev_chipset = this.reaggregate(obj.devices, function (key) {
+    return DeviceKeyToPropKey(key, 'chipset');
+  });
+  dev_chipset = this.reduce(dev_chipset, 'Other', 0.005);
+
+  var elt = this.prepareChartDiv('device-chipset', 'Device Chipsets', 1000, 600);
+  var device_series = this.mapToSeries(dev_chipset);
   this.drawPieChart(elt, device_series);
 }
 

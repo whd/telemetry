@@ -126,3 +126,46 @@ var D2DStatusCode = {
   '1.0': 'Direct2D 1.0',
   '1.1': 'Direct2D 1.1',
 };
+
+function GetDeviceProps(vendor, device_id)
+{
+  if (!(vendor in GfxDeviceMap))
+    return null;
+
+  if (!(device_id in GfxDeviceMap[vendor]))
+    return null;
+
+  return {
+    'gen': GfxDeviceMap[vendor][device_id][0],
+    'chipset': GfxDeviceMap[vendor][device_id][1],
+  }
+}
+
+function SplitDeviceKey(key)
+{
+  var parts = key.split('/');
+  if (parts.length == 2)
+    return parts;
+  return null;
+}
+
+// Take something like
+//   ("0x8086/0x1234", "chipset") -> "Intel <chipset>"
+function DeviceKeyToPropKey(device_key, prop)
+{
+  var parts = SplitDeviceKey(device_key);
+  if (!parts)
+    return "Unknown device " + device_key;
+
+  var vendor = parts[0];
+  var device = parts[1];
+
+  var props = GetDeviceProps(vendor, device);
+  if (!props) {
+    if (!(vendor in VendorMap) || !(vendor in GfxDeviceMap))
+      return "Unknown device " + device_key;
+    return "Unknown device " + VendorMap[vendor] + " " + device;
+  }
+
+  return VendorMap[vendor] + " " + props[prop];
+}

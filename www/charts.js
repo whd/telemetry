@@ -297,9 +297,6 @@ ChartController.prototype.drawGeneral = function ()
   var vendors = this.reduce(obj['vendors'], 'Unknown', 0, function(key) {
     return key in VendorMap;
   });
-  var windows = this.reduce(obj['windows'], 'Other', 0.01, function(key) {
-    return WindowsVersionName(key) != 'Unknown';
-  });
 
   var elt = this.prepareChartDiv('fx-share', 'Firefox Version Usage', 600, 300);
   var fx_series = [];
@@ -321,14 +318,15 @@ ChartController.prototype.drawGeneral = function ()
   }
   this.drawPieChart(elt, vendor_series);
 
+  var windows = this.reduce(obj['windows'], 'Other', 0.005, function(key) {
+    return WindowsVersionName(key) != 'Unknown';
+  });
   var elt = this.prepareChartDiv('winver-share', 'Windows Usage', 700, 500);
-  var winver_series = [];
-  for (var winver in windows) {
-    winver_series.push({
-      label: WindowsVersionName(winver),
-      data: windows[winver],
-    });
-  }
+  var winver_series = this.mapToSeries(windows, function (key) {
+    if (key == 'Other')
+      return key;
+    return WindowsVersionName(key);
+  });
   this.drawPieChart(elt, winver_series);
 
   var dev_gen = this.reaggregate(obj.devices, function (key) {

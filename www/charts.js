@@ -183,14 +183,55 @@ ChartController.prototype.reduce = function (data, combineKey, threshold, callba
 }
 
 // Re-aggregate a dictionary based on a key transformation.
-ChartController.prototype.reaggregate = function (data, keyfn)
+ChartController.prototype.mapToKeyedAgg = function (data, keyfn, labelfn)
 {
   var out = {};
   for (var key in data) {
     var new_key = keyfn(key);
-    out[new_key] = (out[new_key] | 0) + data[key];
+    if (new_key in out)
+      out[new_key].count += data[key];
+    else
+      out[new_key] = { count: data[key], label: labelfn(key) };
   }
   return out;
+}
+
+// Reduce a keyed aggregation based on a threshold.
+ChartController.prototype.reduceAgg = function (data, threshold, combineKey, combineLabel)
+{
+  var total = 0;
+  for (var key in data)
+    total += data[key].count;
+
+  var out = {};
+  for (var key in data) {
+    if (data[key].count / total < threshold) {
+      if (combineKey in out) {
+        out[combineKey].count += data[key].count;
+      } else {
+        out[combineKey] = {
+          count: data[key].count,
+          label: combineLabel,
+        };
+      }
+    } else {
+      out[key] = data[key];
+    }
+  }
+  return out;
+}
+
+ChartController.prototype.aggToSeries = function (data)
+{
+  var series = [];
+  for (var key in data) {
+    series.push({
+      key: key,
+      label: data[key].label,
+      data: data[key].count,
+    });
+  }
+  return series;
 }
 
 ChartController.prototype.createOptionList = function (map, namer)
@@ -329,23 +370,61 @@ ChartController.prototype.drawGeneral = function ()
   });
   this.drawPieChart(elt, winver_series);
 
-  var dev_gen = this.reaggregate(obj.devices, function (key) {
-    return DeviceKeyToPropKey(key, 'gen');
+  var DeviceView = function(parent, data, prop, title) {
+    this.parent = parent;
+    this.prop = prop;
+    this.source = data;
+    this.data = parent.mapToKeyedAgg(this.source,
+      function (key) { return DeviceKeyToPropKey(key, prop); },
+      function (key) { return DeviceKeyToPropLabel(key, prop); }
+    );
+    this.data = parent.reduceAgg(this.data, 0.005, 'other', 'Other');
+    this.series = parent.aggToSeries(this.data);
+    this.current = this.series;
+    this.elt = parent.prepareChartDiv('device-' + prop, title, 1000, 600);
+  };
+  DeviceView.prototype.aggToSeries = function (data) {
+  };
+  DeviceView.prototype.render = (function() {
+    this.elt.unbind('plothover');
+    this.elt.unbind('plotclick');
+    this.parent.drawPieChart(this.elt, this.current);
+    this.elt.bind('plotclick', (function (event, pos, obj) {
+      if (obj)
+        this.zoom(obj);
+      else
+        this.unzoom();
+      this.render();
+    }).bind(this));
   });
-  dev_gen = this.reduce(dev_gen, 'Other', 0.005);
+  DeviceView.prototype.zoom = (function (obj) {
+    var zoom_key = this.series[obj.seriesIndex].key;
 
-  var elt = this.prepareChartDiv('device-gen', 'Device Generations', 1000, 600);
-  var device_series = this.mapToSeries(dev_gen);
-  this.drawPieChart(elt, device_series);
-
-  var dev_chipset = this.reaggregate(obj.devices, function (key) {
-    return DeviceKeyToPropKey(key, 'chipset');
+    var map = {};
+    for (device_key in this.source) {
+      var xkey = DeviceKeyToPropKey(device_key, this.prop);
+      if (zoom_key == 'other') {
+        if (xkey in this.data)
+          continue;
+      } else {
+        if (xkey != zoom_key)
+          continue;
+      }
+      map[device_key] = this.source[device_key];
+    }
+    map = this.parent.reduce(map, 'Other', 0.005);
+    this.current = this.parent.mapToSeries(map, function (key) {
+      return GetDeviceName(key);
+    });
   });
-  dev_chipset = this.reduce(dev_chipset, 'Other', 0.005);
+  DeviceView.prototype.unzoom = (function () {
+    this.current = this.series;
+  });
 
-  var elt = this.prepareChartDiv('device-chipset', 'Device Chipsets', 1000, 600);
-  var device_series = this.mapToSeries(dev_chipset);
-  this.drawPieChart(elt, device_series);
+  var dev_gen = new DeviceView(this, obj.devices, 'gen', 'Device Generations');
+  var dev_chipsets = new DeviceView(this, obj.devices, 'chipset', 'Device Chipsets');
+  dev_gen.render();
+  dev_chipsets.render();
 }
 
 ChartController.prototype.drawCrashReports = function (inReports)

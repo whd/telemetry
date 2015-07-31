@@ -2,7 +2,7 @@ var GfxDeviceMap = {
  "0x8086": {
   "0x016a": [
    "gen7", 
-   "ivybridge"
+   "ivybridge-gt2"
   ], 
   "0x2a12": [
    "gen4", 
@@ -14,11 +14,11 @@ var GfxDeviceMap = {
   ], 
   "0x0426": [
    "gen7", 
-   "haswell"
+   "haswell-gt3"
   ], 
   "0x0422": [
    "gen7", 
-   "haswell"
+   "haswell-gt3"
   ], 
   "0x4102": [
    "powervr", 
@@ -26,27 +26,27 @@ var GfxDeviceMap = {
   ], 
   "0x160e": [
    "gen8", 
-   "broadwell"
+   "broadwell-gt1"
   ], 
   "0x08cf": [
    "powervr", 
-   "sgx5405"
+   "sgx545"
   ], 
   "0x0c2e": [
    "gen7", 
-   "haswell"
+   "haswell-gt3"
   ], 
   "0x160d": [
    "gen8", 
-   "broadwell"
+   "broadwell-gt1"
   ], 
-  "0x0f31": [
+  "0x0c2c": [
    "gen7", 
-   "baytrail"
+   "haswell-gt3"
   ], 
-  "0x0f30": [
+  "0x0c2b": [
    "gen7", 
-   "baytrail"
+   "haswell-gt3"
   ], 
   "0x0f33": [
    "gen7", 
@@ -55,6 +55,10 @@ var GfxDeviceMap = {
   "0x0f32": [
    "gen7", 
    "baytrail"
+  ], 
+  "0x1912": [
+   "gen9", 
+   "skylake-gt2"
   ], 
   "0x2792": [
    "gen3", 
@@ -68,21 +72,21 @@ var GfxDeviceMap = {
    "gen4", 
    "gma4500"
   ], 
-  "0x2e13": [
-   "gen4", 
-   "gma4500"
+  "0x1916": [
+   "gen9", 
+   "skylake-gt2"
   ], 
   "0x042e": [
    "gen7", 
-   "haswell"
+   "haswell-gt3"
   ], 
   "0x042a": [
    "gen7", 
-   "haswell"
+   "haswell-gt3"
   ], 
   "0x042b": [
    "gen7", 
-   "haswell"
+   "haswell-gt3"
   ], 
   "0x29c3": [
    "gen3", 
@@ -90,7 +94,7 @@ var GfxDeviceMap = {
   ], 
   "0x08cb": [
    "powervr", 
-   "sgx5405"
+   "sgx545"
   ], 
   "0x2a03": [
    "gen4", 
@@ -98,35 +102,47 @@ var GfxDeviceMap = {
   ], 
   "0x0162": [
    "gen7", 
-   "ivybridge"
+   "ivybridge-gt2"
   ], 
   "0x0166": [
    "gen7", 
-   "ivybridge"
+   "ivybridge-gt2"
   ], 
   "0x2592": [
    "gen3", 
    "gma900"
   ], 
-  "0x3577": [
-   "gen2", 
-   "830"
+  "0x191b": [
+   "gen9", 
+   "skylake-gt2"
   ], 
-  "0x162b": [
-   "gen8", 
-   "broadwell"
+  "0x191a": [
+   "gen9", 
+   "skylake-gt2"
   ], 
-  "0x2562": [
-   "gen2", 
-   "845"
+  "0x0a26": [
+   "gen7", 
+   "haswell-gt3"
+  ], 
+  "0x191e": [
+   "gen9", 
+   "skylake-gt2"
+  ], 
+  "0x191d": [
+   "gen9", 
+   "skylake-gt2"
+  ], 
+  "0x1a84": [
+   "gen9", 
+   "broxton"
   ], 
   "0x08c9": [
    "powervr", 
-   "sgx5405"
+   "sgx545"
   ], 
   "0x08c8": [
    "powervr", 
-   "sgx5405"
+   "sgx545"
   ], 
   "0x3582": [
    "gen2", 
@@ -134,15 +150,19 @@ var GfxDeviceMap = {
   ], 
   "0x0c26": [
    "gen7", 
-   "haswell"
+   "haswell-gt3"
   ], 
   "0x0c22": [
    "gen7", 
-   "haswell"
+   "haswell-gt3"
+  ], 
+  "0x3577": [
+   "gen2", 
+   "830"
   ], 
   "0x08ce": [
    "powervr", 
-   "sgx5405"
+   "sgx545"
   ], 
   "0x2782": [
    "gen3", 
@@ -160,13 +180,17 @@ var GfxDeviceMap = {
    "gen3", 
    "gma950"
   ], 
+  "0x8108": [
+   "powervr", 
+   "sgx535"
+  ], 
   "0x0155": [
    "gen7", 
    "baytrail"
   ], 
   "0x0156": [
    "gen7", 
-   "ivybridge"
+   "ivybridge-gt1"
   ], 
   "0x0157": [
    "gen7", 
@@ -174,7 +198,7 @@ var GfxDeviceMap = {
   ], 
   "0x0152": [
    "gen7", 
-   "ivybridge"
+   "ivybridge-gt1"
   ], 
   "0x2582": [
    "gen3", 
@@ -186,23 +210,23 @@ var GfxDeviceMap = {
   ], 
   "0x1632": [
    "gen8", 
-   "broadwell"
+   "broadwell-gt3"
   ], 
   "0x0a1a": [
    "gen7", 
-   "haswell"
+   "haswell-gt2"
   ], 
   "0x0a1b": [
    "gen7", 
-   "haswell"
+   "haswell-gt2"
   ], 
   "0x1636": [
    "gen8", 
-   "broadwell"
+   "broadwell-gt3"
   ], 
   "0x0a1e": [
    "gen7", 
-   "haswell"
+   "haswell-gt2"
   ], 
   "0x2e32": [
    "gen4", 
@@ -226,23 +250,23 @@ var GfxDeviceMap = {
   ], 
   "0x162a": [
    "gen8", 
-   "broadwell"
+   "broadwell-gt3"
   ], 
-  "0x0a26": [
-   "gen7", 
-   "haswell"
+  "0x162b": [
+   "gen8", 
+   "broadwell-gt3"
   ], 
   "0x162e": [
    "gen8", 
-   "broadwell"
+   "broadwell-gt3"
   ], 
   "0x162d": [
    "gen8", 
-   "broadwell"
+   "broadwell-gt3"
   ], 
   "0x0a22": [
    "gen7", 
-   "haswell"
+   "haswell-gt3"
   ], 
   "0x7125": [
    "gen1", 
@@ -256,13 +280,17 @@ var GfxDeviceMap = {
    "gen1", 
    "810"
   ], 
+  "0x0a84": [
+   "gen9", 
+   "broxton"
+  ], 
   "0x258a": [
    "gen3", 
    "gma900"
   ], 
   "0x015a": [
    "gen7", 
-   "ivybridge"
+   "ivybridge-gt1"
   ], 
   "0x29d2": [
    "gen3", 
@@ -270,23 +298,23 @@ var GfxDeviceMap = {
   ], 
   "0x08c7": [
    "powervr", 
-   "sgx5405"
+   "sgx545"
   ], 
   "0x0be3": [
    "powervr", 
-   "sgx5405"
+   "sgx545"
   ], 
   "0x0be2": [
    "powervr", 
-   "sgx5405"
+   "sgx545"
   ], 
-  "0x8109": [
+  "0x0be1": [
    "powervr", 
-   "sgx535"
+   "sgx545"
   ], 
-  "0x8108": [
+  "0x0be0": [
    "powervr", 
-   "sgx535"
+   "sgx545"
   ], 
   "0x7800": [
    "gen1", 
@@ -294,23 +322,23 @@ var GfxDeviceMap = {
   ], 
   "0x08cc": [
    "powervr", 
-   "sgx5405"
+   "sgx545"
   ], 
   "0x0a2e": [
    "gen7", 
-   "haswell"
+   "haswell-gt3"
   ], 
   "0x1622": [
    "gen8", 
-   "broadwell"
+   "broadwell-gt3"
   ], 
   "0x0a2a": [
    "gen7", 
-   "haswell"
+   "haswell-gt3"
   ], 
   "0x0a2b": [
    "gen7", 
-   "haswell"
+   "haswell-gt3"
   ], 
   "0x29b3": [
    "gen3", 
@@ -330,15 +358,15 @@ var GfxDeviceMap = {
   ], 
   "0x163b": [
    "gen8", 
-   "broadwell"
+   "broadwell-gt3"
   ], 
   "0x0a12": [
    "gen7", 
-   "haswell"
+   "haswell-gt2"
   ], 
   "0x163a": [
    "gen8", 
-   "broadwell"
+   "broadwell-gt3"
   ], 
   "0x2e23": [
    "gen4", 
@@ -350,23 +378,23 @@ var GfxDeviceMap = {
   ], 
   "0x0a16": [
    "gen7", 
-   "haswell"
+   "haswell-gt2"
   ], 
   "0x163e": [
    "gen8", 
-   "broadwell"
+   "broadwell-gt3"
   ], 
   "0x160b": [
    "gen8", 
-   "broadwell"
+   "broadwell-gt1"
   ], 
   "0x160a": [
    "gen8", 
-   "broadwell"
+   "broadwell-gt1"
   ], 
   "0x08cd": [
    "powervr", 
-   "sgx5405"
+   "sgx545"
   ], 
   "0x22b0": [
    "gen8", 
@@ -384,17 +412,21 @@ var GfxDeviceMap = {
    "gen8", 
    "cherryview"
   ], 
-  "0x0c2c": [
+  "0x0f31": [
    "gen7", 
-   "haswell"
+   "baytrail"
   ], 
-  "0x0be0": [
-   "powervr", 
-   "sgx5405"
+  "0x1921": [
+   "gen9", 
+   "skylake-gt2"
   ], 
-  "0x0c2b": [
+  "0x1926": [
+   "gen9", 
+   "skylake-gt3"
+  ], 
+  "0x0f30": [
    "gen7", 
-   "haswell"
+   "baytrail"
   ], 
   "0x2992": [
    "gen4", 
@@ -406,39 +438,43 @@ var GfxDeviceMap = {
   ], 
   "0x1616": [
    "gen8", 
-   "broadwell"
+   "broadwell-gt2"
   ], 
   "0x08ca": [
    "powervr", 
-   "sgx5405"
+   "sgx545"
   ], 
   "0x1612": [
    "gen8", 
-   "broadwell"
+   "broadwell-gt2"
   ], 
   "0x358e": [
    "gen2", 
    "855"
   ], 
+  "0x8109": [
+   "powervr", 
+   "sgx535"
+  ], 
   "0x0a06": [
    "gen7", 
-   "haswell"
+   "haswell-gt1"
   ], 
   "0x0a02": [
    "gen7", 
-   "haswell"
+   "haswell-gt1"
   ], 
   "0x0d0b": [
    "gen7", 
-   "haswell"
+   "haswell-gt1"
   ], 
   "0x0d0a": [
    "gen7", 
-   "haswell"
+   "haswell-gt1"
   ], 
   "0x0d0e": [
    "gen7", 
-   "haswell"
+   "haswell-gt1"
   ], 
   "0x27a2": [
    "gen3", 
@@ -448,21 +484,25 @@ var GfxDeviceMap = {
    "gen3", 
    "gma950"
   ], 
+  "0x2e13": [
+   "gen4", 
+   "gma4500"
+  ], 
   "0x161d": [
    "gen8", 
-   "broadwell"
+   "broadwell-gt2"
   ], 
   "0x161e": [
    "gen8", 
-   "broadwell"
+   "broadwell-gt2"
   ], 
   "0x161a": [
    "gen8", 
-   "broadwell"
+   "broadwell-gt2"
   ], 
   "0x161b": [
    "gen8", 
-   "broadwell"
+   "broadwell-gt2"
   ], 
   "0x2972": [
    "gen4", 
@@ -474,7 +514,7 @@ var GfxDeviceMap = {
   ], 
   "0x1602": [
    "gen8", 
-   "broadwell"
+   "broadwell-gt1"
   ], 
   "0x2983": [
    "gen4", 
@@ -490,11 +530,19 @@ var GfxDeviceMap = {
   ], 
   "0x1606": [
    "gen8", 
-   "broadwell"
+   "broadwell-gt1"
+  ], 
+  "0x192b": [
+   "gen9", 
+   "skylake-gt3"
   ], 
   "0x29d3": [
    "gen3", 
    "gma3100"
+  ], 
+  "0x192a": [
+   "gen9", 
+   "skylake-gt3"
   ], 
   "0x2e5b": [
    "powervr", 
@@ -506,7 +554,7 @@ var GfxDeviceMap = {
   ], 
   "0x0126": [
    "gen6", 
-   "sandybridge"
+   "sandybridge-gt2"
   ], 
   "0x27ae": [
    "gen3", 
@@ -518,27 +566,23 @@ var GfxDeviceMap = {
   ], 
   "0x0122": [
    "gen6", 
-   "sandybridge"
-  ], 
-  "0x0be1": [
-   "powervr", 
-   "sgx5405"
+   "sandybridge-gt2"
   ], 
   "0x0a0e": [
    "gen7", 
-   "haswell"
+   "haswell-gt1"
   ], 
   "0x0a0b": [
    "gen7", 
-   "haswell"
+   "haswell-gt1"
   ], 
   "0x0a0a": [
    "gen7", 
-   "haswell"
+   "haswell-gt1"
   ], 
   "0x0d02": [
    "gen7", 
-   "haswell"
+   "haswell-gt1"
   ], 
   "0x2e43": [
    "gen4", 
@@ -550,15 +594,19 @@ var GfxDeviceMap = {
   ], 
   "0x0d06": [
    "gen7", 
-   "haswell"
+   "haswell-gt1"
   ], 
   "0x0d1b": [
    "gen7", 
-   "haswell"
+   "haswell-gt2"
+  ], 
+  "0x2562": [
+   "gen2", 
+   "845"
   ], 
   "0x010a": [
    "gen6", 
-   "sandybridge"
+   "sandybridge-gt1"
   ], 
   "0x2a02": [
    "gen4", 
@@ -566,71 +614,79 @@ var GfxDeviceMap = {
   ], 
   "0x1626": [
    "gen8", 
-   "broadwell"
+   "broadwell-gt3"
   ], 
   "0x0c0e": [
    "gen7", 
-   "haswell"
+   "haswell-gt1"
+  ], 
+  "0x190e": [
+   "gen9", 
+   "skylake-gt1"
+  ], 
+  "0x190a": [
+   "gen9", 
+   "skylake-gt1"
   ], 
   "0x0c0c": [
    "gen7", 
-   "haswell"
+   "haswell-gt1"
   ], 
   "0x0c0b": [
    "gen7", 
-   "haswell"
+   "haswell-gt1"
   ], 
   "0x0402": [
    "gen7", 
-   "haswell"
+   "haswell-gt1"
   ], 
   "0x0112": [
    "gen6", 
-   "sandybridge"
+   "sandybridge-gt2"
   ], 
   "0x0406": [
    "gen7", 
-   "haswell"
+   "haswell-gt1"
   ], 
   "0x0116": [
    "gen6", 
-   "sandybridge"
+   "sandybridge-gt2"
   ], 
   "0x0c16": [
    "gen7", 
-   "haswell"
+   "haswell-gt2"
   ], 
   "0x0d2e": [
    "gen7", 
-   "haswell"
+   "haswell-gt3"
   ], 
   "0x0c12": [
    "gen7", 
-   "haswell"
+   "haswell-gt2"
   ], 
   "0x0d2a": [
    "gen7", 
-   "haswell"
+   "haswell-gt3"
   ], 
   "0x0d2b": [
    "gen7", 
-   "haswell"
+   "haswell-gt3"
   ], 
   "0x041a": [
    "gen7", 
-   "haswell"
+   "haswell-gt2"
   ], 
   "0x041b": [
    "gen7", 
-   "haswell"
+   "haswell-gt2"
   ], 
   "0x041e": [
    "gen7", 
-   "haswell"
+   "haswell-gt2"
   ], 
   "0x0d16": [
    "gen7", 
-   "haswell"
+   "haswell-gt2"
   ], 
   "0x29a2": [
    "gen4", 
@@ -640,9 +696,13 @@ var GfxDeviceMap = {
    "gen4", 
    "gma3000"
   ], 
+  "0x5a84": [
+   "gen9", 
+   "broxton"
+  ], 
   "0x0d12": [
    "gen7", 
-   "haswell"
+   "haswell-gt2"
   ], 
   "0x2e92": [
    "gen4", 
@@ -650,11 +710,11 @@ var GfxDeviceMap = {
   ], 
   "0x0106": [
    "gen6", 
-   "sandybridge"
+   "sandybridge-gt1"
   ], 
   "0x0102": [
    "gen6", 
-   "sandybridge"
+   "sandybridge-gt1"
   ], 
   "0x2572": [
    "gen2", 
@@ -662,35 +722,35 @@ var GfxDeviceMap = {
   ], 
   "0x0d26": [
    "gen7", 
-   "haswell"
+   "haswell-gt3"
   ], 
   "0x0c1e": [
    "gen7", 
-   "haswell"
+   "haswell-gt2"
   ], 
   "0x0c1b": [
    "gen7", 
-   "haswell"
+   "haswell-gt2"
   ], 
   "0x0c1c": [
    "gen7", 
-   "haswell"
+   "haswell-gt2"
   ], 
   "0x0d22": [
    "gen7", 
-   "haswell"
+   "haswell-gt3"
   ], 
   "0x0d1a": [
    "gen7", 
-   "haswell"
+   "haswell-gt2"
   ], 
   "0x0412": [
    "gen7", 
-   "haswell"
+   "haswell-gt2"
   ], 
   "0x0d1e": [
    "gen7", 
-   "haswell"
+   "haswell-gt2"
   ], 
   "0x2e93": [
    "gen4", 
@@ -698,31 +758,39 @@ var GfxDeviceMap = {
   ], 
   "0x0416": [
    "gen7", 
-   "haswell"
+   "haswell-gt2"
+  ], 
+  "0x1906": [
+   "gen9", 
+   "skylake-gt1"
   ], 
   "0x0c06": [
    "gen7", 
-   "haswell"
+   "haswell-gt1"
   ], 
   "0x163d": [
    "gen8", 
-   "broadwell"
+   "broadwell-gt3"
+  ], 
+  "0x1902": [
+   "gen9", 
+   "skylake-gt1"
   ], 
   "0x0c02": [
    "gen7", 
-   "haswell"
+   "haswell-gt1"
   ], 
   "0x040b": [
    "gen7", 
-   "haswell"
+   "haswell-gt1"
   ], 
   "0x040a": [
    "gen7", 
-   "haswell"
+   "haswell-gt1"
   ], 
   "0x040e": [
    "gen7", 
-   "haswell"
+   "haswell-gt1"
   ]
  }, 
  "0x10de": {
@@ -826,24 +894,24 @@ var GfxDeviceMap = {
    "Kepler", 
    "GK104GL"
   ], 
-  "0x02e4": [
-   "Tesla", 
-   "G71"
+  "0x11b1": [
+   "Kepler", 
+   "GK104GL"
   ], 
-  "0x02e3": [
-   "Tesla", 
-   "G71"
+  "0x11b6": [
+   "Kepler", 
+   "GK104GLM"
   ], 
-  "0x02e2": [
-   "Tesla", 
-   "G73"
+  "0x11b7": [
+   "Kepler", 
+   "GK104GLM"
   ], 
-  "0x02e1": [
-   "Tesla", 
-   "G73"
+  "0x11b4": [
+   "Kepler", 
+   "GK104GL"
   ], 
   "0x02e0": [
-   "Tesla", 
+   "NV40", 
    "G73"
   ], 
   "0x06dd": [
@@ -994,9 +1062,9 @@ var GfxDeviceMap = {
    "Fermi", 
    "GF104GLM"
   ], 
-  "0x1180": [
-   "Kepler", 
-   "GK104"
+  "0x0e3a": [
+   "Fermi", 
+   "GF104GLM"
   ], 
   "0x11bb": [
    "Kepler", 
@@ -1050,36 +1118,32 @@ var GfxDeviceMap = {
    "NV40", 
    "NV43"
   ], 
-  "0x0403": [
-   "Tesla", 
-   "G84"
-  ], 
   "0x1182": [
    "Kepler", 
    "GK104"
   ], 
   "0x0095": [
-   "Tesla", 
+   "NV40", 
    "G70"
   ], 
   "0x0097": [
-   "Tesla", 
+   "NV40", 
    "G70"
   ], 
   "0x0091": [
-   "Tesla", 
+   "NV40", 
    "G70"
   ], 
-  "0x0090": [
-   "Tesla", 
-   "G70"
+  "0x119d": [
+   "Kepler", 
+   "GK104M"
   ], 
   "0x0093": [
-   "Tesla", 
+   "NV40", 
    "G70"
   ], 
   "0x0092": [
-   "Tesla", 
+   "NV40", 
    "G70"
   ], 
   "0x01a0": [
@@ -1091,11 +1155,11 @@ var GfxDeviceMap = {
    "GK107M"
   ], 
   "0x0099": [
-   "Tesla", 
+   "NV40", 
    "G70M"
   ], 
   "0x0098": [
-   "Tesla", 
+   "NV40", 
    "G70M"
   ], 
   "0x0fdb": [
@@ -1106,24 +1170,24 @@ var GfxDeviceMap = {
    "Fermi", 
    "GF110GL"
   ], 
-  "0x11b1": [
-   "Kepler", 
-   "GK104GL"
+  "0x02e4": [
+   "NV40", 
+   "G71"
   ], 
-  "0x11b6": [
-   "Kepler", 
-   "GK104GLM"
+  "0x02e3": [
+   "NV40", 
+   "G71"
   ], 
   "0x1251": [
    "Fermi", 
    "GF116M"
   ], 
-  "0x11b7": [
-   "Kepler", 
-   "GK104GLM"
+  "0x02e2": [
+   "NV40", 
+   "G73"
   ], 
   "0x009d": [
-   "Tesla", 
+   "NV40", 
    "G70GL"
   ], 
   "0x105a": [
@@ -1146,6 +1210,10 @@ var GfxDeviceMap = {
    "Kepler", 
    "GK107M"
   ], 
+  "0x02e1": [
+   "NV40", 
+   "G73"
+  ], 
   "0x0fd1": [
    "Kepler", 
    "GK107M"
@@ -1157,10 +1225,6 @@ var GfxDeviceMap = {
   "0x0fd3": [
    "Kepler", 
    "GK107M"
-  ], 
-  "0x0de7": [
-   "Fermi", 
-   "GF108"
   ], 
   "0x103a": [
    "Kepler", 
@@ -1185,6 +1249,10 @@ var GfxDeviceMap = {
   "0x129a": [
    "Kepler", 
    "GK208GL"
+  ], 
+  "0x0295": [
+   "NV40", 
+   "G71"
   ], 
   "0x0113": [
    "NV10", 
@@ -1222,9 +1290,9 @@ var GfxDeviceMap = {
    "NV30", 
    "NV37GL"
   ], 
-  "0x0ffd": [
-   "Kepler", 
-   "GK107"
+  "0x0405": [
+   "Tesla", 
+   "G84M"
   ], 
   "0x0042": [
    "NV40", 
@@ -1258,6 +1326,10 @@ var GfxDeviceMap = {
    "NV40", 
    "NV40"
   ], 
+  "0x039a": [
+   "NV40", 
+   "G73M"
+  ], 
   "0x0286": [
    "NV20", 
    "NV28M"
@@ -1287,7 +1359,7 @@ var GfxDeviceMap = {
    "NV43"
   ], 
   "0x00f5": [
-   "Tesla", 
+   "NV40", 
    "G71"
   ], 
   "0x00f6": [
@@ -1338,29 +1410,33 @@ var GfxDeviceMap = {
    "Fermi", 
    "GF108M"
   ], 
+  "0x0de2": [
+   "Fermi", 
+   "GF108"
+  ], 
   "0x039f": [
-   "Tesla", 
+   "NV40", 
    "G73"
   ], 
   "0x039d": [
-   "Tesla", 
+   "NV40", 
    "G73"
   ], 
   "0x039e": [
-   "Tesla", 
+   "NV40", 
    "G73GL"
   ], 
   "0x039b": [
-   "Tesla", 
+   "NV40", 
    "G73M"
   ], 
   "0x039c": [
-   "Tesla", 
+   "NV40", 
    "G73GLM"
   ], 
-  "0x039a": [
-   "Tesla", 
-   "G73M"
+  "0x1022": [
+   "Kepler", 
+   "GK110GL"
   ], 
   "0x118f": [
    "Kepler", 
@@ -1414,6 +1490,10 @@ var GfxDeviceMap = {
    "Tesla", 
    "G80GL"
   ], 
+  "0x118c": [
+   "Kepler", 
+   "GK104"
+  ], 
   "0x107d": [
    "Fermi", 
    "GF119"
@@ -1427,43 +1507,43 @@ var GfxDeviceMap = {
    "GK104"
   ], 
   "0x0398": [
-   "Tesla", 
+   "NV40", 
    "G73M"
   ], 
   "0x0399": [
-   "Tesla", 
+   "NV40", 
    "G73M"
   ], 
   "0x0396": [
-   "Tesla", 
+   "NV40", 
    "G73"
   ], 
-  "0x0397": [
-   "Tesla", 
-   "G73M"
+  "0x1180": [
+   "Kepler", 
+   "GK104"
   ], 
   "0x0394": [
-   "Tesla", 
+   "NV40", 
    "G73"
   ], 
   "0x0395": [
-   "Tesla", 
+   "NV40", 
    "G73"
   ], 
   "0x0392": [
-   "Tesla", 
+   "NV40", 
    "G73"
   ], 
   "0x0393": [
-   "Tesla", 
+   "NV40", 
    "G73"
   ], 
   "0x0390": [
-   "Tesla", 
+   "NV40", 
    "G73"
   ], 
   "0x0391": [
-   "Tesla", 
+   "NV40", 
    "G73"
   ], 
   "0x019d": [
@@ -1510,9 +1590,9 @@ var GfxDeviceMap = {
    "Fermi", 
    "GF110"
   ], 
-  "0x016a": [
-   "NV40", 
-   "NV44"
+  "0x0612": [
+   "Tesla", 
+   "G92"
   ], 
   "0x016e": [
    "NV40", 
@@ -1642,10 +1722,6 @@ var GfxDeviceMap = {
    "Kepler", 
    "GK107GL"
   ], 
-  "0x118a": [
-   "Kepler", 
-   "GK104GL"
-  ], 
   "0x17f0": [
    "Maxwell", 
    "GM200GL"
@@ -1666,9 +1742,9 @@ var GfxDeviceMap = {
    "NV40", 
    "NV44"
   ], 
-  "0x1290": [
-   "Kepler", 
-   "GK208M"
+  "0x0164": [
+   "NV40", 
+   "NV44M"
   ], 
   "0x0167": [
    "NV40", 
@@ -1750,10 +1826,6 @@ var GfxDeviceMap = {
    "Fermi", 
    "GF108"
   ], 
-  "0x1291": [
-   "Kepler", 
-   "GK208M"
-  ], 
   "0x0a38": [
    "Tesla", 
    "GT216GL"
@@ -1782,17 +1854,13 @@ var GfxDeviceMap = {
    "Tesla", 
    "GT216"
   ], 
-  "0x0e3a": [
-   "Fermi", 
-   "GF104GLM"
-  ], 
   "0x0de4": [
    "Fermi", 
    "GF108"
   ], 
-  "0x0659": [
-   "Tesla", 
-   "G96GL"
+  "0x0de7": [
+   "Fermi", 
+   "GF108"
   ], 
   "0x0608": [
    "Tesla", 
@@ -1826,9 +1894,9 @@ var GfxDeviceMap = {
    "Tesla", 
    "G92"
   ], 
-  "0x05f9": [
+  "0x0604": [
    "Tesla", 
-   "GT200GL"
+   "G92"
   ], 
   "0x05f8": [
    "Tesla", 
@@ -1970,10 +2038,6 @@ var GfxDeviceMap = {
    "Tesla", 
    "G92"
   ], 
-  "0x1294": [
-   "Kepler", 
-   "GK208M"
-  ], 
   "0x060f": [
    "Tesla", 
    "G92M"
@@ -2050,10 +2114,6 @@ var GfxDeviceMap = {
    "Kepler", 
    "GK107M"
   ], 
-  "0x0605": [
-   "Tesla", 
-   "G92"
-  ], 
   "0x0fe0": [
    "Kepler", 
    "GK107M"
@@ -2073,6 +2133,10 @@ var GfxDeviceMap = {
   "0x0a26": [
    "Tesla", 
    "GT216"
+  ], 
+  "0x0397": [
+   "NV40", 
+   "G73M"
   ], 
   "0x1243": [
    "Fermi", 
@@ -2230,10 +2294,6 @@ var GfxDeviceMap = {
    "Fermi", 
    "GF108M"
   ], 
-  "0x11e2": [
-   "Kepler", 
-   "GK106M"
-  ], 
   "0x0fec": [
    "Kepler", 
    "GK107M"
@@ -2318,29 +2378,29 @@ var GfxDeviceMap = {
    "Tesla", 
    "G98GLM"
   ], 
-  "0x0292": [
-   "Tesla", 
-   "G71"
+  "0x1290": [
+   "Kepler", 
+   "GK208M"
   ], 
   "0x0291": [
-   "Tesla", 
+   "NV40", 
    "G71"
   ], 
-  "0x0290": [
+  "0x06fa": [
    "Tesla", 
-   "G71"
+   "G98"
   ], 
-  "0x0297": [
+  "0x06ff": [
    "Tesla", 
-   "G71M"
+   "G98"
   ], 
-  "0x0295": [
+  "0x06fd": [
    "Tesla", 
-   "G71"
+   "G98"
   ], 
-  "0x0294": [
-   "Tesla", 
-   "G71"
+  "0x1291": [
+   "Kepler", 
+   "GK208M"
   ], 
   "0x0110": [
    "NV10", 
@@ -2351,11 +2411,11 @@ var GfxDeviceMap = {
    "NV18"
   ], 
   "0x0299": [
-   "Tesla", 
+   "NV40", 
    "G71M"
   ], 
   "0x0298": [
-   "Tesla", 
+   "NV40", 
    "G71M"
   ], 
   "0x018c": [
@@ -2374,10 +2434,6 @@ var GfxDeviceMap = {
    "NV10", 
    "NV15"
   ], 
-  "0x11b4": [
-   "Kepler", 
-   "GK104GL"
-  ], 
   "0x0dc0": [
    "Fermi", 
    "GF106"
@@ -2395,15 +2451,15 @@ var GfxDeviceMap = {
    "GF106"
   ], 
   "0x01dc": [
-   "Tesla", 
+   "NV40", 
    "G72GLM"
   ], 
-  "0x01db": [
-   "Tesla", 
-   "G72M"
+  "0x1294": [
+   "Kepler", 
+   "GK208M"
   ], 
   "0x01da": [
-   "Tesla", 
+   "NV40", 
    "G72M"
   ], 
   "0x06cb": [
@@ -2411,24 +2467,24 @@ var GfxDeviceMap = {
    "GF100"
   ], 
   "0x01df": [
-   "Tesla", 
+   "NV40", 
    "G72"
   ], 
   "0x01de": [
-   "Tesla", 
+   "NV40", 
    "G72GL"
   ], 
-  "0x01dd": [
-   "Tesla", 
-   "G72"
+  "0x118a": [
+   "Kepler", 
+   "GK104GL"
   ], 
   "0x118b": [
    "Kepler", 
    "GK104GL"
   ], 
-  "0x118c": [
-   "Kepler", 
-   "GK104"
+  "0x0a6f": [
+   "Tesla", 
+   "GT218"
   ], 
   "0x10d8": [
    "Tesla", 
@@ -2459,11 +2515,11 @@ var GfxDeviceMap = {
    "G96M"
   ], 
   "0x01d9": [
-   "Tesla", 
+   "NV40", 
    "G72M"
   ], 
   "0x01d8": [
-   "Tesla", 
+   "NV40", 
    "G72M"
   ], 
   "0x0dce": [
@@ -2475,43 +2531,43 @@ var GfxDeviceMap = {
    "GF106M"
   ], 
   "0x01d3": [
-   "Tesla", 
+   "NV40", 
    "G72"
   ], 
   "0x01d2": [
-   "Tesla", 
+   "NV40", 
    "G72"
   ], 
   "0x01d1": [
-   "Tesla", 
+   "NV40", 
    "G72"
   ], 
   "0x01d0": [
-   "Tesla", 
+   "NV40", 
    "G72"
   ], 
   "0x01d7": [
-   "Tesla", 
+   "NV40", 
    "G72M"
   ], 
   "0x01d6": [
-   "Tesla", 
+   "NV40", 
    "G72M"
   ], 
   "0x01d5": [
-   "Tesla", 
+   "NV40", 
    "G72"
   ], 
   "0x029c": [
-   "Tesla", 
+   "NV40", 
    "G71GL"
   ], 
   "0x029b": [
-   "Tesla", 
+   "NV40", 
    "G71GLM"
   ], 
   "0x029a": [
-   "Tesla", 
+   "NV40", 
    "G71GLM"
   ], 
   "0x06f1": [
@@ -2519,15 +2575,15 @@ var GfxDeviceMap = {
    "G98M"
   ], 
   "0x029f": [
-   "Tesla", 
+   "NV40", 
    "G71GL"
   ], 
   "0x029e": [
-   "Tesla", 
+   "NV40", 
    "G71GL"
   ], 
   "0x029d": [
-   "Tesla", 
+   "NV40", 
    "G71GL"
   ], 
   "0x0187": [
@@ -2557,6 +2613,10 @@ var GfxDeviceMap = {
   "0x0181": [
    "NV10", 
    "NV18"
+  ], 
+  "0x016a": [
+   "NV40", 
+   "NV44"
   ], 
   "0x137a": [
    "Maxwell", 
@@ -2654,6 +2714,10 @@ var GfxDeviceMap = {
    "Kepler", 
    "GK107GL"
   ], 
+  "0x0090": [
+   "NV40", 
+   "G70"
+  ], 
   "0x042d": [
    "Tesla", 
    "G86GLM"
@@ -2679,12 +2743,12 @@ var GfxDeviceMap = {
    "G86"
   ], 
   "0x038b": [
-   "Tesla", 
+   "NV40", 
    "G73"
   ], 
-  "0x0a27": [
-   "Tesla", 
-   "GT216"
+  "0x002b": [
+   "NV5", 
+   "NV5"
   ], 
   "0x01f0": [
    "NV10", 
@@ -2854,9 +2918,9 @@ var GfxDeviceMap = {
    "NV5", 
    "NV5"
   ], 
-  "0x002b": [
-   "NV5", 
-   "NV5"
+  "0x0a27": [
+   "Tesla", 
+   "GT216"
   ], 
   "0x002c": [
    "NV5", 
@@ -3278,10 +3342,6 @@ var GfxDeviceMap = {
    "Maxwell", 
    "GM204"
   ], 
-  "0x06d9": [
-   "Fermi", 
-   "GF100GL"
-  ], 
   "0x0fc2": [
    "Kepler", 
    "GK107"
@@ -3291,12 +3351,12 @@ var GfxDeviceMap = {
    "GF108"
   ], 
   "0x0293": [
-   "Tesla", 
+   "NV40", 
    "G71"
   ], 
-  "0x0612": [
+  "0x0659": [
    "Tesla", 
-   "G92"
+   "G96GL"
   ], 
   "0x0658": [
    "Tesla", 
@@ -3314,9 +3374,9 @@ var GfxDeviceMap = {
    "Fermi", 
    "GF108M"
   ], 
-  "0x0de2": [
-   "Fermi", 
-   "GF108"
+  "0x0292": [
+   "NV40", 
+   "G71"
   ], 
   "0x0653": [
    "Tesla", 
@@ -3346,9 +3406,9 @@ var GfxDeviceMap = {
    "Tesla", 
    "G96M"
   ], 
-  "0x06fa": [
-   "Tesla", 
-   "G98"
+  "0x0290": [
+   "NV40", 
+   "G71"
   ], 
   "0x0103": [
    "NV10", 
@@ -3362,13 +3422,13 @@ var GfxDeviceMap = {
    "NV10", 
    "NV10"
   ], 
-  "0x06ff": [
-   "Tesla", 
-   "G98"
+  "0x0297": [
+   "NV40", 
+   "G71M"
   ], 
-  "0x0ca9": [
+  "0x062a": [
    "Tesla", 
-   "GT215M"
+   "G94M"
   ], 
   "0x11e7": [
    "Kepler", 
@@ -3382,9 +3442,9 @@ var GfxDeviceMap = {
    "Kepler", 
    "GK106M"
   ], 
-  "0x06fd": [
-   "Tesla", 
-   "G98"
+  "0x11e2": [
+   "Kepler", 
+   "GK106M"
   ], 
   "0x11e1": [
    "Kepler", 
@@ -3401,6 +3461,10 @@ var GfxDeviceMap = {
   "0x0fcd": [
    "Kepler", 
    "GK107M"
+  ], 
+  "0x0294": [
+   "NV40", 
+   "G71"
   ], 
   "0x0152": [
    "NV10", 
@@ -3434,9 +3498,9 @@ var GfxDeviceMap = {
    "Kepler", 
    "GK208M"
   ], 
-  "0x0a6f": [
+  "0x0403": [
    "Tesla", 
-   "GT218"
+   "G84"
   ], 
   "0x1298": [
    "Kepler", 
@@ -3450,9 +3514,9 @@ var GfxDeviceMap = {
    "NV10", 
    "NV11M"
   ], 
-  "0x0164": [
-   "NV40", 
-   "NV44M"
+  "0x06d9": [
+   "Fermi", 
+   "GF100GL"
   ], 
   "0x0fe5": [
    "Kepler", 
@@ -3598,13 +3662,13 @@ var GfxDeviceMap = {
    "Tesla", 
    "GT215M"
   ], 
-  "0x062a": [
+  "0x0ca9": [
    "Tesla", 
-   "G94M"
+   "GT215M"
   ], 
-  "0x119d": [
-   "Kepler", 
-   "GK104M"
+  "0x01db": [
+   "NV40", 
+   "G72M"
   ], 
   "0x0cb0": [
    "Tesla", 
@@ -3661,6 +3725,10 @@ var GfxDeviceMap = {
   "0x0241": [
    "NV40", 
    "C51"
+  ], 
+  "0x01dd": [
+   "NV40", 
+   "G72"
   ], 
   "0x0531": [
    "NV40", 
@@ -3729,6 +3797,10 @@ var GfxDeviceMap = {
   "0x0320": [
    "NV30", 
    "NV34"
+  ], 
+  "0x0ffd": [
+   "Kepler", 
+   "GK107"
   ], 
   "0x0222": [
    "NV40", 
@@ -3894,10 +3966,6 @@ var GfxDeviceMap = {
    "Fermi", 
    "GF119"
   ], 
-  "0x1022": [
-   "Kepler", 
-   "GK110GL"
-  ], 
   "0x03d0": [
    "NV40", 
    "C61"
@@ -3938,9 +4006,9 @@ var GfxDeviceMap = {
    "Tesla", 
    "G84"
   ], 
-  "0x0604": [
+  "0x05f9": [
    "Tesla", 
-   "G92"
+   "GT200GL"
   ], 
   "0x0400": [
    "Tesla", 
@@ -3962,9 +4030,9 @@ var GfxDeviceMap = {
    "Tesla", 
    "G84"
   ], 
-  "0x0405": [
+  "0x0605": [
    "Tesla", 
-   "G84M"
+   "G92"
   ], 
   "0x119a": [
    "Kepler", 

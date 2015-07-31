@@ -149,23 +149,34 @@ function SplitDeviceKey(key)
   return null;
 }
 
-// Take something like
-//   ("0x8086/0x1234", "chipset") -> "Intel <chipset>"
 function DeviceKeyToPropKey(device_key, prop)
 {
   var parts = SplitDeviceKey(device_key);
   if (!parts)
-    return "Unknown device " + device_key;
+    return 'unrecognized';
 
   var vendor = parts[0];
   var device = parts[1];
 
   var props = GetDeviceProps(vendor, device);
-  if (!props) {
-    if (!(vendor in VendorMap) || !(vendor in GfxDeviceMap))
-      return "Unknown device " + device_key;
-    return "Unknown device " + VendorMap[vendor] + " " + device;
-  }
+  if (!props)
+    return 'unrecognized';
+  return props[prop];
+}
 
+// Take something like
+//   ("0x8086/0x1234", "chipset") -> "Intel <chipset>"
+function DeviceKeyToPropLabel(device_key, prop)
+{
+  var parts = SplitDeviceKey(device_key);
+  if (!parts)
+    return 'Unrecognized';
+
+  var vendor = parts[0];
+  var device = parts[1];
+
+  var props = GetDeviceProps(vendor, device);
+  if (!props)
+    return 'Unrecognized';
   return VendorMap[vendor] + " " + props[prop];
 }

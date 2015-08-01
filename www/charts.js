@@ -390,10 +390,10 @@ ChartController.prototype.drawGeneral = function ()
     this.elt.unbind('plotclick');
     this.parent.drawPieChart(this.elt, this.current);
     this.elt.bind('plotclick', (function (event, pos, obj) {
-      if (obj)
-        this.zoom(obj);
-      else
+      if (!obj)
         this.unzoom();
+      else if (this.series == this.current)
+        this.zoom(obj);
       this.render();
     }).bind(this));
   });

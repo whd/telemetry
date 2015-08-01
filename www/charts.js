@@ -677,6 +677,12 @@ ChartController.prototype.drawWindowsFeatures = function ()
     });
   this.drawPieChart(elt, series);
 
+  if (Object.keys(source.warp).length > 0) {
+    var elt = this.prepareChartDiv('warp-breakdown', 'WARP Fallback Reasons', 600, 300);
+    var series = this.mapToSeries(source.warp);
+    this.drawPieChart(elt, series);
+  }
+
   var elt = this.prepareChartDiv(
     'texture-sharing-breakdown',
     'Direct3D11 Texture Sharing',

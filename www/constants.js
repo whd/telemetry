@@ -91,8 +91,8 @@ var StartupTestCode = [
   "Acceleration disabled from crash"
 ];
 var SanityTestReason = [
-  "New Profile",
-  "Firefox Update",
+  "New profile",
+  "Firefox update",
   "Device change",
   "Driver change",
 ];

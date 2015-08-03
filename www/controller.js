@@ -145,6 +145,8 @@ Controller.prototype.changeView = function (view)
     case 'monitors':
       this.charts.drawMonitors();
       break;
+    case 'about':
+      this.displayAbout();
   }
 }
 
@@ -154,6 +156,28 @@ Controller.prototype.getParam = function (key, defaultValue)
   if (key in this.queryParams)
     return this.queryParams[key];
   return defaultValue;
+}
+
+Controller.prototype.displayAbout = function ()
+{
+  $('#viewport').append(
+    $('<p></p>').text(
+      'The graphics telemetry dashboard currently updates every night at 1PM UTC (6AM Eastern Time). The update process takes about 2 hours.'
+    ),
+    $('<p></p>').text(
+      'Note that some graphs rely on Telemetry instumentation that only exists on newer channels.'
+    ),
+    $('<p></p>').text(
+      'Make sure to check the sample source on each page, since certain channels (like nightly) often have different biases than the general beta and aurora populations.'
+    ),
+    $('<p></p>').text(
+      'As of 8/3/2015, release channel pings are not included in any sample sets.'
+    ),
+    $('<p></p>').append(
+      $('<span></span>').text("Source code: "),
+      $('<a href="https://github.com/dvander/moz-gfx-telemetry">').text("https://github.com/dvander/moz-gfx-telemetry")
+    )
+  );
 }
 
 function Startup()

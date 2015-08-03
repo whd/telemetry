@@ -90,6 +90,12 @@ var StartupTestCode = [
   "Crash detected",
   "Acceleration disabled from crash"
 ];
+var SanityTestReason = [
+  "New Profile",
+  "Firefox Update",
+  "Device change",
+  "Driver change",
+];
 
 function GetDeviceName(device)
 {

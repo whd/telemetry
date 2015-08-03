@@ -1,5 +1,5 @@
 // vim: set ts=2 sw=2 tw=99 et:
-var USE_S3_FOR_CHART_DATA = true;
+var USE_S3_FOR_CHART_DATA = false;
 
 function ChartController(app)
 {
@@ -789,11 +789,22 @@ ChartController.prototype.drawSanityTests = function ()
 
   var elt = this.prepareChartDiv(
     'sanity-test-results',
-    'Sanity test results',
+    'Sanity Test results',
     600, 300);
   var series = this.listToSeries(obj.results,
     function (index) {
       return SanityTestCode[index];
+    }
+  );
+  this.drawPieChart(elt, series);
+
+  var elt = this.prepareChartDiv(
+    'sanity-test-reasons',
+    'Sanity Test triggers',
+    600, 300);
+  var series = this.listToSeries(obj.reasons,
+    function (index) {
+      return SanityTestReason[index];
     }
   );
   this.drawPieChart(elt, series);

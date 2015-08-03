@@ -1,4 +1,6 @@
 // vim: set ts=2 sw=2 tw=99 et:
+var USE_S3_FOR_CHART_DATA = true;
+
 function ChartController(app)
 {
   this.app = app;
@@ -146,8 +148,12 @@ ChartController.prototype.ensureData = function (key, callback)
 
   state.callbacks.push(callback);
 
+  var prefix = USE_S3_FOR_CHART_DATA
+               ? 'https://s3-us-west-2.amazonaws.com/telemetry-public-analysis/gfx-telemetry/data/'
+               : 'data/';
+
   $.ajax({
-    url: 'data/' + key,
+    url: prefix + key,
     dataType: 'json',
   }).done(function (data) {
     state.obj = (typeof data == 'string')

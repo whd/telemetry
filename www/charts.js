@@ -798,6 +798,7 @@ ChartController.prototype.drawSanityTests = function ()
   );
   this.drawPieChart(elt, series);
 
+  /*
   var elt = this.prepareChartDiv(
     'sanity-test-reasons',
     'Sanity Test triggers',
@@ -808,6 +809,7 @@ ChartController.prototype.drawSanityTests = function ()
     }
   );
   this.drawPieChart(elt, series);
+  */
 
   for (var i = 0; i < obj.byOS.length; i++) {
     var key = obj.byOS[i][0];

@@ -774,10 +774,30 @@ ChartController.prototype.drawSanityTests = function ()
   if (!obj)
     return;
 
+  var optionMap = {
+    'vista': 'Windows Vista+',
+    'xp': 'Windows XP',
+  };
+  var options = this.createOptionList(optionMap, function (key) {
+    return optionMap[key];
+  });
+  var filter = this.app.addFilter(
+    'category',
+    'OS Category',
+    options,
+    this.app.refresh.bind(this.app),
+    'vista');
+
+  var subset;
+  if (filter.val() == 'xp')
+    subset = obj.windowsXP;
+  else
+    subset = obj.windows;
+
   this.drawSampleInfo(obj);
 
   var infoText = obj.sanityTestPings + " (" +
-                 this.toPercent(obj.sanityTestPings / obj.sessions.count) + "% of sessions)";
+                 this.toPercent(subset.sanityTestPings / obj.sessions.count) + "% of sessions)";
 
   $("#viewport").append(
       $("<p></p>").append(
@@ -791,7 +811,7 @@ ChartController.prototype.drawSanityTests = function ()
     'sanity-test-results',
     'Sanity Test results',
     600, 300);
-  var series = this.listToSeries(obj.results,
+  var series = this.listToSeries(subset.results,
     function (index) {
       return SanityTestCode[index];
     }
@@ -811,9 +831,9 @@ ChartController.prototype.drawSanityTests = function ()
   this.drawPieChart(elt, series);
   */
 
-  for (var i = 0; i < obj.byOS.length; i++) {
-    var key = obj.byOS[i][0];
-    var data = obj.byOS[i][1];
+  for (var i = 0; i < subset.byOS.length; i++) {
+    var key = subset.byOS[i][0];
+    var data = subset.byOS[i][1];
     var elt = this.prepareChartDiv(
       'sanity-test-by-os-' + key,
       SanityTestCode[key] + ', by Operating System',
@@ -825,9 +845,9 @@ ChartController.prototype.drawSanityTests = function ()
     this.drawPieChart(elt, series);
   }
 
-  for (var i = 0; i < obj.byVendor.length; i++) {
-    var key = obj.byVendor[i][0];
-    var data = obj.byVendor[i][1];
+  for (var i = 0; i < subset.byVendor.length; i++) {
+    var key = subset.byVendor[i][0];
+    var data = subset.byVendor[i][1];
     var elt = this.prepareChartDiv(
       'sanity-test-by-vendor-' + key,
       SanityTestCode[key] + ', by Graphics Vendor',
@@ -839,9 +859,9 @@ ChartController.prototype.drawSanityTests = function ()
     this.drawPieChart(elt, series);
   }
 
-  for (var i = 0; i < obj.byDevice.length; i++) {
-    var key = obj.byDevice[i][0];
-    var data = obj.byDevice[i][1];
+  for (var i = 0; i < subset.byDevice.length; i++) {
+    var key = subset.byDevice[i][0];
+    var data = subset.byDevice[i][1];
     var elt = this.prepareChartDiv(
       'sanity-test-by-device-' + key,
       SanityTestCode[key] + ', by Graphics Device',
@@ -853,9 +873,9 @@ ChartController.prototype.drawSanityTests = function ()
     this.drawPieChart(elt, series);
   }
 
-  for (var i = 0; i < obj.byDriver.length; i++) {
-    var key = obj.byDriver[i][0];
-    var data = obj.byDriver[i][1];
+  for (var i = 0; i < subset.byDriver.length; i++) {
+    var key = subset.byDriver[i][0];
+    var data = subset.byDriver[i][1];
     var elt = this.prepareChartDiv(
       'sanity-test-by-driver-' + key,
       SanityTestCode[key] + ', by Graphics Driver',

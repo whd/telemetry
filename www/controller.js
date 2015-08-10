@@ -170,9 +170,6 @@ Controller.prototype.displayAbout = function ()
     $('<p></p>').text(
       'Make sure to check the sample source on each page, since certain channels (like nightly) often have different biases than the general beta and aurora populations.'
     ),
-    $('<p></p>').text(
-      'As of 8/3/2015, release channel pings are not included in any sample sets.'
-    ),
     $('<p></p>').append(
       $('<span></span>').text("Source code: "),
       $('<a href="https://github.com/dvander/moz-gfx-telemetry">').text("https://github.com/dvander/moz-gfx-telemetry")

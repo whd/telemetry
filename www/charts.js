@@ -296,26 +296,30 @@ ChartController.prototype.toPercent = function (val)
 
 ChartController.prototype.drawSampleInfo = function (obj)
 {
-  var count = obj.sessions.count;
-  var days = obj.sessions.days;
-  var fraction = obj.sessions.fraction;
-  var channels = obj.sessions.channels
-                 ? (Array.isArray(obj.sessions.channels)
-                    ? (obj.sessions.channels.join(', ') + ' channels')
-                    : obj.sessions.channels)
-                 : 'all channels';
+  var blobs = [];
+  for (var i = 0; i < obj.sessions.metadata.length; i++) {
+    var md = obj.sessions.metadata[i].info;
+    var channel = (md.channel == '*')
+                  ? 'all'
+                  : md.channel;
+    var text = channel + ' (' +
+               this.toPercent(md.fraction) + '% sample rate, ';
+    if (md.day_range)
+      text += 'over ' + md.day_range + ' days of sessions';
+    else
+      text += 'over builds from the last ' + md.build_range + ' days';
+    text += ')';
+    blobs.push(text);
+  }
 
-  var sourceText = channels + ", " +
-                   parseFloat((fraction * 100).toFixed(2)) + "% sample rate, " + 
-                   "over " + days + " days, taken on " + 
-                   (new Date(obj.sessions.timestamp * 1000)).toLocaleDateString();
-
+  var sourceText = (new Date(obj.sessions.timestamp * 1000)).toLocaleDateString() +
+                   ', channels: ' + blobs.join(', ');
 
   $("#viewport").append(
       $("<p></p>").append(
         $("<strong></strong>").text("Sample size: ")
       ).append(
-        $("<span></span>").text(count + " sessions")
+        $("<span></span>").text(obj.sessions.count + " sessions")
       ),
       $("<p></p>").append(
         $("<strong></strong>").text("Sample source: ")
@@ -796,8 +800,8 @@ ChartController.prototype.drawSanityTests = function ()
 
   this.drawSampleInfo(obj);
 
-  var infoText = obj.sanityTestPings + " (" +
-                 this.toPercent(subset.sanityTestPings / obj.sessions.count) + "% of sessions)";
+  var infoText = subset.sanityTestPings + " (" +
+                 this.toPercent(subset.sanityTestPings / subset.totalPings) + "% of sessions)";
 
   $("#viewport").append(
       $("<p></p>").append(
@@ -811,9 +815,9 @@ ChartController.prototype.drawSanityTests = function ()
     'sanity-test-results',
     'Sanity Test results',
     600, 300);
-  var series = this.listToSeries(subset.results,
-    function (index) {
-      return SanityTestCode[index];
+  var series = this.mapToSeries(subset.results,
+    function (key) {
+      return SanityTestCode[parseInt(key)];
     }
   );
   this.drawPieChart(elt, series);

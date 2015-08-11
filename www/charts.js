@@ -350,13 +350,9 @@ ChartController.prototype.drawGeneral = function ()
   });
 
   var elt = this.prepareChartDiv('fx-share', 'Firefox Version Usage', 600, 300);
-  var fx_series = [];
-  for (var fxversion in obj['firefox']) {
-    fx_series.push({
-      label: 'Firefox ' + fxversion,
-      data: obj['firefox'][fxversion],
-    });
-  }
+  var fx_series = this.mapToSeries(obj.sessions.share, function (key) {
+    return "Firefox " + key;
+  });
   this.drawPieChart(elt, fx_series);
 
   var elt = this.prepareChartDiv('vendor-share', 'Device Vendor Usage', 600, 300);

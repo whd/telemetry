@@ -320,9 +320,11 @@ ChartController.prototype.drawSampleInfo = function (obj)
 
       if (info_div.is(":visible")) {
         info_div.hide();
+        href.text('Click to show sample information.');
       } else {
         info_div.show();
         renderInfo();
+        href.text('Click to hide sample information.');
       }
     }).bind(this));
 

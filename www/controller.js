@@ -145,8 +145,12 @@ Controller.prototype.changeView = function (view)
     case 'monitors':
       this.charts.drawMonitors();
       break;
+    case 'apz':
+      this.charts.drawAPZ();
+      break;
     case 'about':
       this.displayAbout();
+      break;
   }
 }
 

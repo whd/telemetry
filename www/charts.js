@@ -296,18 +296,54 @@ ChartController.prototype.toPercent = function (val)
 
 ChartController.prototype.drawSampleInfo = function (obj)
 {
+  var info_div = $("<div/>")
+    .hide();
+
+  var chart_div = $('<div/>', {
+    id: 'session-source-info',
+    width: 300,
+    height: 150
+  });
+
+  var renderInfo = (function () {
+    var series = this.mapToSeries(obj.sessions.share, function (key) {
+      return "Firefox " + key;
+    });
+    this.drawPieChart(chart_div, series);
+  }).bind(this);
+
+  var href = $("<a>")
+    .text("Click to show sample information.")
+    .attr('href', '#')
+    .click((function (e) {
+      e.preventDefault();
+
+      if (info_div.is(":visible")) {
+        info_div.hide();
+      } else {
+        info_div.show();
+        renderInfo();
+      }
+    }).bind(this));
+
+  $("#viewport").append(
+      $("<p></p>").append(
+        $("<strong></strong>").append(href)
+      ),
+      info_div
+  );
+
   var blobs = [];
   for (var i = 0; i < obj.sessions.metadata.length; i++) {
     var md = obj.sessions.metadata[i].info;
     var channel = (md.channel == '*')
                   ? 'all'
                   : md.channel;
-    var text = channel + ' (' +
-               this.toPercent(md.fraction) + '% sample rate, ';
+    var text = channel + ' (';
     if (md.day_range)
-      text += 'over ' + md.day_range + ' days of sessions';
+      text += md.day_range + ' days of sessions';
     else
-      text += 'over builds from the last ' + md.build_range + ' days';
+      text += 'builds from the last ' + md.build_range + ' days';
     text += ')';
     blobs.push(text);
   }
@@ -315,17 +351,21 @@ ChartController.prototype.drawSampleInfo = function (obj)
   var sourceText = (new Date(obj.sessions.timestamp * 1000)).toLocaleDateString() +
                    ', channels: ' + blobs.join(', ');
 
-  $("#viewport").append(
+  info_div.append(
       $("<p></p>").append(
-        $("<strong></strong>").text("Sample size: ")
+        $("<strong></strong>").text("Size: ")
       ).append(
         $("<span></span>").text(obj.sessions.count + " sessions")
       ),
       $("<p></p>").append(
-        $("<strong></strong>").text("Sample source: ")
+        $("<strong></strong>").text("Source: ")
       ).append(
         $("<span></span>").text(sourceText)
-      )
+      ),
+      $('<h4></h4>').text('Sample Makeup'),
+      $('<br>'),
+      $('<br>'),
+      chart_div
   );
 };
 
@@ -1011,4 +1051,45 @@ ChartController.prototype.drawTDRs = function ()
     }
     this.drawPieChart(elt, tdrs);
   }
+}
+
+ChartController.prototype.drawAPZ = function ()
+{
+  var obj = this.ensureData('apz-statistics.json', this.drawAPZ.bind(this));
+  if (!obj)
+    return;
+
+  this.drawSampleInfo(obj);
+
+  var apzText = obj.disabled + ' (' +
+                this.toPercent(obj.disabled / obj.sessions.count) + '%)';
+
+  $("#viewport").append(
+      $("<p></p>").append(
+        $("<strong></strong>").text("Sessions with APZ disabled: ")
+      ).append(
+        $("<span></span>").text(apzText)
+      )
+  );
+
+  var elt = this.prepareChartDiv(
+      'apz-disabled-os',
+      'APZ Disabled, by OS',
+      600, 300);
+  var series = this.mapToSeries(obj.byOS, GetOSName);
+  this.drawPieChart(elt, series);
+
+  var elt = this.prepareChartDiv(
+      'apz-disabled-res',
+      'APZ Disabled, by Resolution',
+      600, 300);
+  var series = this.mapToSeries(obj.byResolution);
+  this.drawPieChart(elt, series);
+
+  var elt = this.prepareChartDiv(
+      'apz-disabled-device',
+      'APZ Disabled, by Device',
+      600, 300);
+  var series = this.mapToSeries(obj.byDevice, GetDeviceName);
+  this.drawPieChart(elt, series);
 }

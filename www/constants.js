@@ -45,27 +45,67 @@ var IsMajorVendor = function (vendor)
 }
 
 var WindowsVersionMap = {
-  '5.1': 'Windows XP',
-  '5.2': 'Windows Server 2003',
-  '6.0': 'Windows Vista',
-  '6.1': 'Windows 7',
-  '6.2': 'Windows 8',
-  '6.3': 'Windows 8.1',
-  '10.0': 'Windows 10',
+  '5.1': 'XP',
+  '5.2': 'Server 2003',
+  '6.0': 'Vista',
+  '6.1': '7',
+  '6.2': '8',
+  '6.3': '8.1',
+  '10.0': '10',
 };
-function WindowsVersionName(code)
+function GetWindowsVersion(code)
 {
   if (code.indexOf("Windows-") == 0)
     code = code.substr(8);
   var parts = code.split('.');
   if (parts.length < 2)
-    return 'Unknown';
+    return null;
   var base = parts[0] + '.' + parts[1];
   if (!(base in WindowsVersionMap))
-    return 'Unknown';
+    return null;
   if (parts.length >= 3 && parseInt(parts[2]) != 0)
     return WindowsVersionMap[base] + ' SP' + parts[2];
   return WindowsVersionMap[base];
+}
+function WindowsVersionName(code)
+{
+  var version = GetWindowsVersion(code);
+  if (!version)
+    return 'Unknown';
+  return 'Windows ' + version;
+}
+function GetDarwinVersion(version)
+{
+  var parts = version.split('.');
+  var major = parseInt(parts[0]);
+  if (!major || major < 5)
+    return null;
+  return '10.' + (major - 4);
+}
+
+function GetOSName(key)
+{
+  var parts = key.split('-');
+  if (parts.length == 0)
+    return 'Unknown';
+
+  var version = null;
+  switch (parts[0]) {
+    case 'Darwin':
+      if (parts.length >= 2)
+        version = GetDarwinVersion(parts[1]);
+      if (!version)
+        return 'Mac OS X (Unknown)';
+      return 'Mac OS X ' + version;
+    case 'Windows':
+      if (parts.length >= 2)
+        version = WindowsVersionName(parts[1]);
+      if (!version)
+        return 'Windows (Unknown)';
+      return 'Windows ' + version;
+    default:
+      return parts[0] + ' ' + parts.slice(1).join('-');
+  }
 }
 
 var DeviceResetReason = [
@@ -102,8 +142,15 @@ function GetDeviceName(device)
   if (device in PCIDeviceMap)
     return PCIDeviceMap[device];
   var parts = device.split('/');
-  if (parts.length == 2)
-    return GetVendorName(parts[0]) + ' ' + parts[1];
+  if (parts.length == 2) {
+    var vendor = parts[0];
+    if (vendor in GfxDeviceMap) {
+      var devices = GfxDeviceMap[vendor];
+      if (parts[1] in devices)
+        return GetVendorName(vendor) + ' ' + devices[parts[1]][1];
+    }
+    return GetVendorName(vendor) + ' ' + parts[1];
+  }
   return device;
 }
 

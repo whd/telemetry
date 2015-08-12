@@ -1127,3 +1127,138 @@ ChartController.prototype.drawAPZ = function ()
   var series = this.mapToSeries(obj.byDevice, GetDeviceName);
   this.drawPieChart(elt, series);
 }
+
+ChartController.prototype.displayHardwareSearch = function() {
+  var detail = this.ensureData('device-statistics.json', this.displayHardwareSearch.bind(this));
+  if (!detail)
+    return;
+
+  var general = this.ensureData('general-statistics.json', this.displayHardwareSearch.bind(this));
+  if (!general)
+    return;
+
+  this.drawSampleInfo(general);
+
+  var vendorChooser = (function () {
+    var vendorSelector = $('<select></select>', { id: 'vendor-chooser' });
+    for (var i = 0; i < MajorVendors.length; i++) {
+      var key = MajorVendors[i];
+      vendorSelector.append($('<option></option>', {
+        value: key,
+      }).text(VendorMap[key]));
+    }
+    return vendorSelector;
+  })();
+
+  function getSearchTerm(str) {
+    if (str.indexOf('*') == -1) {
+      return str;
+    }
+    var escaped = str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    var converted = escaped.replace('\\*', '.*');
+    return new RegExp('^' + converted + '$');
+  }
+
+  function startSearch() {
+    var vendor = vendorChooser.val();
+
+    var devicestr = $('#device-search').val().trim();
+    var driverstr = $('#driver-search').val().trim();
+
+    var result;
+    if (devicestr.length && !driverstr.length) {
+      var devices = [];
+
+      var devicearr = devicestr.split(',');
+      for (var i = 0; i < devicearr.length; i++) {
+        var device = devicearr[i].trim();
+        devices.push(vendor + '/' + device.toLowerCase());
+      }
+
+      result = Search.ByDevices(general.devices, devices);
+    } else if (driverstr.length && !devicestr.length) {
+      var drivers = [];
+
+      var driverarr = driverstr.split(',');
+      for (var i = 0; i < driverarr.length; i++) {
+        var driver = vendor + '/' + driverarr[i].trim();
+        drivers.push(getSearchTerm(driver));
+      }
+
+      result = Search.ByTerm(general.drivers, drivers);
+    } else {
+      var devices = devicestr.split(',');
+      var drivers = driverstr.split(',');
+      var terms = [];
+
+      for (var device_index = 0; device_index < devices.length; device_index++) {
+        var prefix = vendor + '/' + devices[device_index].toLowerCase() + '/';
+        for (var driver_index = 0; driver_index < drivers.length; driver_index++) {
+          terms.push(getSearchTerm(prefix + drivers[driver_index]));
+        }
+      }
+
+      result = Search.ByTerm(detail.deviceAndDriver, terms);
+    }
+
+    var result_box = $('#result-box');
+    result_box.text(result[0].toLocaleString() + ' out of ' +
+                    result[1].toLocaleString() + ' sessions matched (' +
+                    this.toPercent(result[0] / result[1]) + '%)'); 
+
+    this.app.updateViewHash('vendor', devicestr);
+    if (devicestr.length)
+      this.app.updateViewHash('devices', devicestr);
+    if (driverstr.length)
+      this.app.updateViewHash('drivers', driverstr);
+  }
+
+  function makeChooser(kind) {
+    var searchBox = $('<input></input>', {
+      id: kind + '-search',
+      type: 'text',
+    }).prop({
+      size: 30,
+    });
+    if (kind == 'driver')
+      searchBox.attr('placeholder', '8.900.*');
+    else if (kind == 'device')
+      searchBox.attr('placeholder', '0x0102, 0x0116');
+
+    var div = $('<div></div>');
+    div.append(searchBox);
+    return div;
+  }
+
+  var control_div = $('<div></div>');
+  control_div.append(
+    $('<p></p>').text('Fill in filter options below, then click "Search".'),
+    $('<p></p>').text('Using both filters is an AND. Using multiple patterns (joined by commas) is an OR.'),
+    $('<span></span>').text('Vendor: '),
+    vendorChooser,
+    $('<p></p>'),
+    $('<span></span>').text('Devices: '),
+    makeChooser('device'),
+    $('<p></p>'),
+    $('<span></span>').text('Drivers: '),
+    makeChooser('driver'),
+    $('<p></p>')
+  );
+
+  var button = $('<input type="button" value="Search"></input>');
+  button.click(startSearch.bind(this));
+  control_div.append(button);
+
+  control_div.append($('<p></p>', {
+    id: 'result-box'
+  }));
+
+  $('#viewport').append(control_div);
+
+  if (this.app.getParam('vendor', undefined) !== undefined)
+    vendorChooser.val(this.app.getParam('vendor'));
+  if (this.app.getParam('drivers', undefined) !== undefined)
+    $('#driver-search').val(this.app.getParam('drivers'));
+  if (this.app.getParam('devices', undefined) !== undefined)
+    $('#device-search').val(this.app.getParam('devices'));
+}

@@ -87,6 +87,15 @@ Controller.prototype.onHashChange = function ()
 }
 
 // Update the hash URL based on local parameters.
+Controller.prototype.updateViewHash = function (key, val)
+{
+  // This will make sure it gets wiped on view change.
+  if (!(key in this.queryHooks))
+    this.queryHooks[key] = null;
+  this.updateHash(key, val);
+}
+
+// Update the hash URL based on local parameters.
 Controller.prototype.updateHash = function (key, val)
 {
   this.ignoreHashChange = true;
@@ -154,6 +163,9 @@ Controller.prototype.changeView = function (view)
       break;
     case 'apz':
       this.charts.drawAPZ();
+      break;
+    case 'hwsearch':
+      this.charts.displayHardwareSearch();
       break;
     case 'about':
       this.displayAbout();

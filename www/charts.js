@@ -357,7 +357,7 @@ ChartController.prototype.drawSampleInfo = function (obj)
       $("<p></p>").append(
         $("<strong></strong>").text("Size: ")
       ).append(
-        $("<span></span>").text(obj.sessions.count + " sessions")
+        $("<span></span>").text(obj.sessions.count.toLocaleString() + " sessions")
       ),
       $("<p></p>").append(
         $("<strong></strong>").text("Source: ")
@@ -377,46 +377,82 @@ ChartController.prototype.drawGeneral = function ()
   if (!obj)
     return;
 
-  this.drawSampleInfo(obj);
+  if ('all' in obj) {
+    obj.byFx = {};
+    obj.byFx['all'] = obj.all;
+    obj.byFx['39'] = obj['39'];
+    obj.byFx['40'] = obj['40'];
+    obj.byFx['41'] = obj['41'];
+    obj.byFx['42'] = obj['42'];
+    obj.byFx['43'] = obj['43'];
+  }
+
+  var options = this.createOptionList(obj.byFx, function (key) {
+    if (key == 'all')
+      return 'All';
+    return "Firefox " + key;
+  });
+  var filter = this.app.addFilter(
+    'fxversion',
+    'Firefox Version',
+    options,
+    this.app.refresh.bind(this.app),
+    'all');
+
+  var subset = null;
+  if (filter.val() == 'all') {
+    subset = obj.all;
+    this.drawSampleInfo(obj);
+  } else {
+    subset = obj.byFx[filter.val()];
+    var total = 0;
+    for (var key in subset.os)
+      total += subset.os[key];
+    $('#viewport').append(
+      $('<p></p>').append(
+        $('<strong></strong>').text('Total sessions: '),
+        $('<span></span>').text(total.toLocaleString())
+      )
+    );
+  }
 
   var elt = this.prepareChartDiv('os-share', 'Operating System Usage', 600, 300);
-  var oses = obj['os'];
   this.drawPieChart(elt, [
-      { label: "Windows", data: parseInt(oses['Windows']) },
-      { label: "Linux", data: parseInt(oses['Linux']) },
-      { label: "OS X", data: parseInt(oses['Darwin']) },
+      { label: "Windows", data: parseInt(subset.os['Windows']) },
+      { label: "Linux", data: parseInt(subset.os['Linux']) },
+      { label: "OS X", data: parseInt(subset.os['Darwin']) },
   ]);
 
-  var vendors = this.reduce(obj['vendors'], 'Unknown', 0, function(key) {
+  if (filter.val() == 'all') {
+    var elt = this.prepareChartDiv('fx-share', 'Firefox Version Usage', 600, 300);
+    var fx_series = this.mapToSeries(obj.sessions.share, function (key) {
+      return "Firefox " + key;
+    });
+    this.drawPieChart(elt, fx_series);
+  }
+
+  var vendors = this.reduce(subset.vendors, 'Unknown', 0, function(key) {
     return key in VendorMap;
   });
 
-  var elt = this.prepareChartDiv('fx-share', 'Firefox Version Usage', 600, 300);
-  var fx_series = this.mapToSeries(obj.sessions.share, function (key) {
-    return "Firefox " + key;
-  });
-  this.drawPieChart(elt, fx_series);
-
   var elt = this.prepareChartDiv('vendor-share', 'Device Vendor Usage', 600, 300);
-  var vendor_series = [];
-  for (var vendor in vendors) {
-    vendor_series.push({
-      label: LookupVendor(vendor),
-      data: vendors[vendor],
-    });
-  }
+  var vendor_series = this.mapToSeries(vendors, LookupVendor);
   this.drawPieChart(elt, vendor_series);
 
-  var windows = this.reduce(obj['windows'], 'Other', 0.005, function(key) {
+  var windows = this.reduce(subset.windows, 'Other', 0.005, function(key) {
     return WindowsVersionName(key) != 'Unknown';
   });
-  var elt = this.prepareChartDiv('winver-share', 'Windows Usage', 700, 500);
+  var elt = this.prepareChartDiv('winver-share', 'Windows Usage', 700, 300);
   var winver_series = this.mapToSeries(windows, function (key) {
     if (key == 'Other')
       return key;
     return WindowsVersionName(key);
   });
   this.drawPieChart(elt, winver_series);
+
+  // Everything else is specific to the "all" category.
+  if (filter.val() != 'all')
+    return;
 
   var DeviceView = function(parent, data, prop, title) {
     this.parent = parent;
@@ -429,7 +465,7 @@ ChartController.prototype.drawGeneral = function ()
     this.data = parent.reduceAgg(this.data, 0.005, 'other', 'Other');
     this.series = parent.aggToSeries(this.data);
     this.current = this.series;
-    this.elt = parent.prepareChartDiv('device-' + prop, title, 1000, 600);
+    this.elt = parent.prepareChartDiv('device-' + prop, title, 1000, 500);
   };
   DeviceView.prototype.aggToSeries = function (data) {
   };

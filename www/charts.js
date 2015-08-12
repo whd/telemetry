@@ -1106,11 +1106,20 @@ ChartController.prototype.drawAPZ = function ()
       )
   );
 
+  var os = {};
+  for (var key in obj.byOS) {
+    var new_key = GetOSName(key);
+    if (new_key in os)
+      os[new_key] += obj.byOS[key];
+    else
+      os[new_key] = obj.byOS[key];
+  }
+
   var elt = this.prepareChartDiv(
       'apz-disabled-os',
       'APZ Disabled, by OS',
       600, 300);
-  var series = this.mapToSeries(obj.byOS, GetOSName);
+  var series = this.mapToSeries(os);
   this.drawPieChart(elt, series);
 
   var elt = this.prepareChartDiv(
@@ -1221,7 +1230,7 @@ ChartController.prototype.displayHardwareSearch = function() {
       size: 30,
     });
     if (kind == 'driver')
-      searchBox.attr('placeholder', '8.900.*');
+      searchBox.attr('placeholder', '8.15.10.*');
     else if (kind == 'device')
       searchBox.attr('placeholder', '0x0102, 0x0116');
 

@@ -111,7 +111,14 @@ Controller.prototype.refresh = function ()
 // Change the top-level view of the page.
 Controller.prototype.changeView = function (view)
 {
-  $("#viewChooser").val(view);
+  if (this.view != $('#viewChooser').val()) {
+    // When changing views, zap anything we don't want to stick in the hash.
+    for (var key in this.queryHooks)
+      delete this.queryParams[key];
+
+    $("#viewChooser").val(view);
+  }
+
   $("#viewport").empty();
   this.charts.clear();
   this.queryHooks = {};

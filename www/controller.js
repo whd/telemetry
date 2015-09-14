@@ -167,6 +167,12 @@ Controller.prototype.changeView = function (view)
     case 'hwsearch':
       this.charts.displayHardwareSearch();
       break;
+    case 'snapshots':
+      this.charts.drawSnapshots();
+      break;
+    case 'system':
+      this.charts.drawSystem();
+      break;
     case 'about':
       this.displayAbout();
       break;

@@ -46,7 +46,79 @@ ChartController.prototype.prepareChartDiv = function (id, title, width, height)
   return elt;
 }
 
-ChartController.prototype.drawPieChart = function (elt, data)
+ChartController.prototype.drawChart = function (type, elt, data, aOptions)
+{
+  aOptions = aOptions || {};
+
+  if (type == 'pie')
+    return this.drawPieChart(elt, data);
+
+  var options = {
+    series: {},
+    legend: {
+      show: true,
+    },
+    grid: {
+      hoverable: true,
+      clickable: true,
+    }
+  };
+
+  var dataset = [];
+  switch (type) {
+  case 'bar':
+    dataset.push(data.series);
+    options.series.bars = {
+      show: true,
+      align: 'center',
+      barWidth: 0.6,
+      fill: true,
+      lineWidth: 0,
+      fillColor: 'rgb(155,200,123)',
+    };
+
+    var ticks = [];
+    for (var i = 0; i < data.labels.length; i++)
+      ticks.push([i, data.labels[i]]);
+    options.xaxis = {
+      ticks: ticks,
+    };
+
+    options.yaxis = {};
+    options.yaxis.tickFormatter = data.formatter;
+    break;
+  };
+
+  // Merge custom options.
+  for (var key in aOptions) {
+    if (typeof(aOptions[key]) != 'object')
+      continue;
+    for (var subkey in aOptions[key])
+      options[key][subkey] = aOptions[key][subkey];
+  }
+
+  $.plot(elt, dataset, options);
+  elt.bind('plothover', (function (event, pos, obj) {
+    if (!obj) {
+      this.removeHover();
+      return;
+    }
+    if (this.activeHover) {
+      if (this.activeHover.id == event.target && this.activeHover.label == obj.seriesIndex)
+        return;
+      this.removeHover();
+    }
+
+    var item = data.labels[obj.dataIndex];
+    var value = data.series[obj.dataIndex][1];
+    var text = item + " - " + data.formatter(value.toFixed(2));
+
+    this.activeHover = new ToolTip(event.target, obj.seriesIndex, text);
+    this.activeHover.draw(pos.pageX, pos.pageY);
+  }).bind(this));
+}
+
+ChartController.prototype.drawPieChart = function(elt, data)
 {
   data.sort(function(a, b) {
     return b.data - a.data;
@@ -58,7 +130,7 @@ ChartController.prototype.drawPieChart = function (elt, data)
   for (var i = 0; i < data.length; i++)
     percentages[data[i].label] = ((data[i].data / total) * 100).toFixed(1);
 
-  $.plot(elt, data, {
+  var options = {
     series: {
       pie: {
         show: true,
@@ -76,8 +148,10 @@ ChartController.prototype.drawPieChart = function (elt, data)
     grid: {
       hoverable: true,
       clickable: true,
-    },
-  });
+    }
+  };
+
+  $.plot(elt, data, options);
   elt.bind('plothover', (function (event, pos, obj) {
     if (!obj) {
       this.removeHover();
@@ -148,7 +222,7 @@ ChartController.prototype.ensureData = function (key, callback)
 
   state.callbacks.push(callback);
 
-  var prefix = USE_S3_FOR_CHART_DATA
+  var prefix = (USE_S3_FOR_CHART_DATA && key != 'snapshots.json') || key == 'device-statistics.json'
                ? 'https://s3-us-west-2.amazonaws.com/telemetry-public-analysis/gfx-telemetry/data/'
                : 'data/';
 
@@ -401,7 +475,7 @@ ChartController.prototype.drawGeneral = function ()
 
   var subset = null;
   if (filter.val() == 'all') {
-    subset = obj.all;
+    subset = obj.all || obj.byFx.all;
     this.drawSampleInfo(obj);
   } else {
     subset = obj.byFx[filter.val()];
@@ -411,7 +485,8 @@ ChartController.prototype.drawGeneral = function ()
     $('#viewport').append(
       $('<p></p>').append(
         $('<strong></strong>').text('Total sessions: '),
-        $('<span></span>').text(total.toLocaleString())
+        $('<span></span>').text(total.toLocaleString()),
+        $('<span></span>').text(' (out of ' + obj.sessions.count.toLocaleString() + ' sampled)')
       )
     );
   }
@@ -589,6 +664,15 @@ ChartController.prototype.drawCrashReports = function (inReports)
       $('<li></li>').text('RAM: ' + (report.adapter.RAM ? report.adapter.RAM : "unknown"))
     );
     ul.append($('<li></li>').text('Adapter:').append(adapter));
+
+    if (report.snapshot) {
+      var canvas = $('<canvas></canvas>');
+      var ctx = canvas[0].getContext('2d');
+      var image = new Image();
+      image.src = report.snapshot;
+      ctx.drawImage(image, 0, 0);
+      ul.append($('<li></li>').text('Snapshot:').append(canvas));
+    }
 
     $('#viewport').append(ul);
   }
@@ -811,6 +895,18 @@ ChartController.prototype.drawStartupData = function ()
   this.drawPieChart(elt, series);
 
   this.drawCrashReports(obj.reports);
+}
+
+ChartController.prototype.drawSnapshots = function ()
+{
+  var obj = this.ensureData('snapshots.json', this.drawSnapshots.bind(this));
+  if (!obj)
+    return;
+
+  var startAt = this.app.getParam('startAt', 0) | 0;
+  var slice = obj.slice(startAt, startAt + 500);
+
+  this.drawCrashReports(slice);
 }
 
 ChartController.prototype.drawTestCrashes = function ()
@@ -1085,6 +1181,81 @@ ChartController.prototype.drawTDRs = function ()
     }
     this.drawPieChart(elt, tdrs);
   }
+}
+
+ChartController.prototype.drawSystem = function ()
+{
+  var obj = this.ensureData('system-statistics.json', this.drawSystem.bind(this));
+  if (!obj)
+    return;
+
+  this.drawSampleInfo(obj);
+
+  var elt = this.prepareChartDiv('logical-cores', 'Logical Cores', 500, 300);
+  var cores = this.reduce(obj.logical_cores, 'Other', 0.01);
+  this.drawChart('pie', elt, this.mapToSeries(cores, function (key) {
+    if (key == '1')
+      return '1 core';
+    if (key == 'Other')
+      return 'Other';
+    return key + ' cores';
+  }));
+
+  // Cull out erroneous 0.
+  var memory = {};
+  for (var key in obj.memory)
+    memory[key] = obj.memory[key];
+  if ('0' in memory) {
+    memory['1'] = (memory['1'] | 0) + memory['0'];
+    delete memory['1'];
+  }
+
+  var elt = this.prepareChartDiv('memory', 'Memory', 500, 300);
+  this.drawChart('pie', elt, this.mapToSeries(memory, function (key) {
+    switch (key) {
+    case 'less_1gb':
+      return '<1GB';
+    case '4_to_8':
+      return '4-8GB';
+    case '8_to_16':
+      return '8-16GB';
+    case '16_to_32gb':
+      return '16-32GB';
+    case 'more_32':
+      return '>32GB';
+    }
+    return key + 'GB';
+  }));
+
+  var elt = this.prepareChartDiv('windows-arch', 'Windows Architectures', 500, 300);
+  this.drawChart('pie', elt, this.mapToSeries(obj.wow, function (key) {
+    switch (key) {
+      case '32':
+        return '32-bit';
+      case '32_on_64':
+        return '32-bit on 64-bit';
+      case '64':
+        return '64-bit';
+      default:
+        return 'unknown';
+    }
+  }));
+
+  var data = { series: [], labels: [] };
+  for (var feature in obj.x86.features) {
+    var label = (feature.substr(0, 3) == 'has')
+                ? feature.substr(3)
+                : feature;
+    var count = obj.x86.features[feature];
+    data.series.push([data.labels.length, (count / obj.x86.total) * 100]);
+    data.labels.push(label);
+  }
+  data.formatter = function (n, obj) {
+    return n + '%';
+  }
+
+  var elt = this.prepareChartDiv('arches', 'x86/64 CPU Features', 500, 300);
+  this.drawChart('bar', elt, data, { yaxis: { max: 100 }});
 }
 
 ChartController.prototype.drawAPZ = function ()

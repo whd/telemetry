@@ -223,7 +223,7 @@ ChartController.prototype.ensureData = function (key, callback)
   state.callbacks.push(callback);
 
   var prefix = (USE_S3_FOR_CHART_DATA && key != 'snapshots.json') || key == 'device-statistics.json'
-               ? 'https://s3-us-west-2.amazonaws.com/telemetry-public-analysis/gfx-telemetry/data/'
+               ? 'https://analysis-output.telemetry.mozilla.org/gfx-telemetry/data/'
                : 'data/';
 
   $.ajax({

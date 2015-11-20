@@ -183,6 +183,40 @@ var D2DStatusCode = {
   '1.1': 'Direct2D 1.1',
 };
 
+var OSXNameMap = {
+  '10.5': 'Leopard',
+  '10.6': 'Snow Leopard',
+  '10.7': 'Lion',
+  '10.8': 'Mountain Lion',
+  '10.9': 'Mavericks',
+  '10.10': 'Yosemite',
+  '10.11': 'El Capitan',
+};
+
+function DarwinVersionToOSX(darwin_version)
+{
+  var parts = darwin_version.split('.');
+  if (parts.length < 2 || isNaN(parts[0]) || isNaN(parts[1]))
+    return 'unknown';
+  var major = parseInt(parts[0]);
+  if (!(major >= 4))
+    return 'unknown';
+  var osx = major - 4;
+  return '10.' + osx;
+}
+
+function DarwinVersionToOSXFull(darwin_version)
+{
+  var parts = darwin_version.split('.');
+  if (parts.length < 2 || isNaN(parts[0]) || isNaN(parts[1]) || isNaN(parts[2]))
+    return 'unknown';
+  var major = parseInt(parts[0]);
+  if (!(major >= 4))
+    return 'unknown';
+  var osx = major - 4;
+  return '10.' + osx + '.' + parts[1];
+}
+
 function GetDeviceProps(vendor, device_id)
 {
   if (!(vendor in GfxDeviceMap))

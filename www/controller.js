@@ -173,6 +173,9 @@ Controller.prototype.changeView = function (view)
     case 'system':
       this.charts.drawSystem();
       break;
+    case 'mac':
+      this.charts.drawMacStats();
+      break;
     case 'about':
       this.displayAbout();
       break;

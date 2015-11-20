@@ -271,7 +271,7 @@ ChartController.prototype.mapToKeyedAgg = function (data, keyfn, labelfn)
     if (new_key in out)
       out[new_key].count += data[key];
     else
-      out[new_key] = { count: data[key], label: labelfn(key) };
+      out[new_key] = { count: data[key], label: labelfn(key, new_key) };
   }
   return out;
 }
@@ -1308,6 +1308,71 @@ ChartController.prototype.drawAPZ = function ()
       600, 300);
   var series = this.mapToSeries(obj.byDevice, GetDeviceName);
   this.drawPieChart(elt, series);
+}
+
+ChartController.prototype.drawMacStats = function ()
+{
+  var obj = this.ensureData('mac-statistics.json', this.drawMacStats.bind(this));
+  if (!obj)
+    return;
+
+  this.drawSampleInfo(obj);
+
+  var elt = this.prepareChartDiv(
+    'osx-versions',
+    'OS X Versions',
+    600, 300);
+
+  var mac_versions = this.mapToKeyedAgg(obj.versions,
+    DarwinVersionToOSX,
+    function (old_key, new_key) {
+      return 'OS X ' + new_key + ' (' + OSXNameMap[new_key] + ')';
+    }
+  );
+  this.drawPieChart(elt, this.aggToSeries(mac_versions));
+
+  var elt = this.prepareChartDiv(
+    'screens',
+    'Screen Scale',
+    600, 300);
+  this.drawPieChart(elt, this.mapToSeries(obj.retina, function (key) {
+    if (key == 1)
+      return 'Normal';
+    if (key == 2)
+      return 'Retina';
+    return key;
+  }));
+
+  var elt = this.prepareChartDiv(
+    'arch',
+    'Firefox Architecture',
+    600, 300);
+  this.drawPieChart(elt, this.mapToSeries(obj.arch, function (key) {
+    if (key == 64)
+      return '64-bit';
+    if (key == 32)
+      return '32-bit';
+    return 'Unknown';
+  }));
+
+  for (var i = 6; i <= 11; i++) {
+    var osx_version = '10.' + i;
+    var elt = this.prepareChartDiv(
+      'osx-' + osx_version,
+      'OS X ' + osx_version + ' (' + OSXNameMap[osx_version] + ') - Breakdown',
+      600, 300);
+
+    var new_map = {};
+    for (var key in obj.versions) {
+      if (DarwinVersionToOSX(key) == osx_version)
+        new_map[key] = obj.versions[key];
+    }
+    var reduced = this.mapToKeyedAgg(new_map,
+      DarwinVersionToOSXFull,
+      function (old_key, new_key) { return new_key; }
+    );
+    this.drawPieChart(elt, this.aggToSeries(reduced));
+  }
 }
 
 ChartController.prototype.displayHardwareSearch = function() {

@@ -271,7 +271,7 @@ ChartController.prototype.mapToKeyedAgg = function (data, keyfn, labelfn)
     if (new_key in out)
       out[new_key].count += data[key];
     else
-      out[new_key] = { count: data[key], label: labelfn(key) };
+      out[new_key] = { count: data[key], label: labelfn(key, new_key) };
   }
   return out;
 }
@@ -1227,15 +1227,15 @@ ChartController.prototype.drawSystem = function ()
     return key + 'GB';
   }));
 
-  var elt = this.prepareChartDiv('windows-arch', 'Windows Architectures', 500, 300);
+  var elt = this.prepareChartDiv('windows-arch', 'Windows Architectures', 550, 300);
   this.drawChart('pie', elt, this.mapToSeries(obj.wow, function (key) {
     switch (key) {
       case '32':
-        return '32-bit';
+        return '32-bit Windows';
       case '32_on_64':
-        return '32-bit on 64-bit';
+        return '32-bit Firefox on 64-bit Windows';
       case '64':
-        return '64-bit';
+        return '64-bit Firefox';
       default:
         return 'unknown';
     }
@@ -1243,9 +1243,11 @@ ChartController.prototype.drawSystem = function ()
 
   var data = { series: [], labels: [] };
   for (var feature in obj.x86.features) {
-    var label = (feature.substr(0, 3) == 'has')
-                ? feature.substr(3)
-                : feature;
+    if (feature.substr(0, 3) != 'has')
+      continue;
+    var label = feature.substr(3);
+    if (label == 'NEON' || label == 'EDSP')
+      continue;
     var count = obj.x86.features[feature];
     data.series.push([data.labels.length, (count / obj.x86.total) * 100]);
     data.labels.push(label);
@@ -1306,6 +1308,71 @@ ChartController.prototype.drawAPZ = function ()
       600, 300);
   var series = this.mapToSeries(obj.byDevice, GetDeviceName);
   this.drawPieChart(elt, series);
+}
+
+ChartController.prototype.drawMacStats = function ()
+{
+  var obj = this.ensureData('mac-statistics.json', this.drawMacStats.bind(this));
+  if (!obj)
+    return;
+
+  this.drawSampleInfo(obj);
+
+  var elt = this.prepareChartDiv(
+    'osx-versions',
+    'OS X Versions',
+    600, 300);
+
+  var mac_versions = this.mapToKeyedAgg(obj.versions,
+    DarwinVersionToOSX,
+    function (old_key, new_key) {
+      return 'OS X ' + new_key + ' (' + OSXNameMap[new_key] + ')';
+    }
+  );
+  this.drawPieChart(elt, this.aggToSeries(mac_versions));
+
+  var elt = this.prepareChartDiv(
+    'screens',
+    'Screen Scale',
+    600, 300);
+  this.drawPieChart(elt, this.mapToSeries(obj.retina, function (key) {
+    if (key == 1)
+      return 'Normal';
+    if (key == 2)
+      return 'Retina';
+    return key;
+  }));
+
+  var elt = this.prepareChartDiv(
+    'arch',
+    'Firefox Architecture',
+    600, 300);
+  this.drawPieChart(elt, this.mapToSeries(obj.arch, function (key) {
+    if (key == 64)
+      return '64-bit';
+    if (key == 32)
+      return '32-bit';
+    return 'Unknown';
+  }));
+
+  for (var i = 6; i <= 11; i++) {
+    var osx_version = '10.' + i;
+    var elt = this.prepareChartDiv(
+      'osx-' + osx_version,
+      'OS X ' + osx_version + ' (' + OSXNameMap[osx_version] + ') - Breakdown',
+      600, 300);
+
+    var new_map = {};
+    for (var key in obj.versions) {
+      if (DarwinVersionToOSX(key) == osx_version)
+        new_map[key] = obj.versions[key];
+    }
+    var reduced = this.mapToKeyedAgg(new_map,
+      DarwinVersionToOSXFull,
+      function (old_key, new_key) { return new_key; }
+    );
+    this.drawPieChart(elt, this.aggToSeries(reduced));
+  }
 }
 
 ChartController.prototype.displayHardwareSearch = function() {

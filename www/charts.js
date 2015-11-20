@@ -1227,15 +1227,15 @@ ChartController.prototype.drawSystem = function ()
     return key + 'GB';
   }));
 
-  var elt = this.prepareChartDiv('windows-arch', 'Windows Architectures', 500, 300);
+  var elt = this.prepareChartDiv('windows-arch', 'Windows Architectures', 550, 300);
   this.drawChart('pie', elt, this.mapToSeries(obj.wow, function (key) {
     switch (key) {
       case '32':
-        return '32-bit';
+        return '32-bit Windows';
       case '32_on_64':
-        return '32-bit on 64-bit';
+        return '32-bit Firefox on 64-bit Windows';
       case '64':
-        return '64-bit';
+        return '64-bit Firefox';
       default:
         return 'unknown';
     }
@@ -1243,9 +1243,11 @@ ChartController.prototype.drawSystem = function ()
 
   var data = { series: [], labels: [] };
   for (var feature in obj.x86.features) {
-    var label = (feature.substr(0, 3) == 'has')
-                ? feature.substr(3)
-                : feature;
+    if (feature.substr(0, 3) != 'has')
+      continue;
+    var label = feature.substr(3);
+    if (label == 'NEON' || label == 'EDSP')
+      continue;
     var count = obj.x86.features[feature];
     data.series.push([data.labels.length, (count / obj.x86.total) * 100]);
     data.labels.push(label);

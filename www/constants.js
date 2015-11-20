@@ -10,6 +10,7 @@ var VendorMap = {
   '0x102b': 'Matrox',
   '0x15ad': 'VMWare',
   '0x80ee': 'Oracle VirtualBox',
+  '0x1414': 'Microsoft Basic',
 };
 function LookupVendor(code)
 {
@@ -102,7 +103,7 @@ function GetOSName(key)
         version = WindowsVersionName(parts[1]);
       if (!version)
         return 'Windows (Unknown)';
-      return 'Windows ' + version;
+      return version;
     default:
       return parts[0] + ' ' + parts.slice(1).join('-');
   }
@@ -123,6 +124,8 @@ var SanityTestCode = [
   "Render failed",
   "Video failed",
   "Crashed",
+  null,
+  "Timed out",
 ];
 var StartupTestCode = [
   "Ok",

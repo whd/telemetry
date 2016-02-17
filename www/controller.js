@@ -176,6 +176,9 @@ Controller.prototype.changeView = function (view)
     case 'mac':
       this.charts.drawMacStats();
       break;
+    case 'blacklisting':
+      this.charts.drawBlacklistingStats();
+      break;
     case 'about':
       this.displayAbout();
       break;

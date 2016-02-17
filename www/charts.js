@@ -1,5 +1,5 @@
 // vim: set ts=2 sw=2 tw=99 et:
-var USE_S3_FOR_CHART_DATA = false;
+var USE_S3_FOR_CHART_DATA = true;
 
 function ChartController(app)
 {
@@ -222,7 +222,8 @@ ChartController.prototype.ensureData = function (key, callback)
 
   state.callbacks.push(callback);
 
-  var prefix = (USE_S3_FOR_CHART_DATA && key != 'snapshots.json') || key == 'device-statistics.json'
+  var prefix = (USE_S3_FOR_CHART_DATA &&
+                (key != 'snapshots.json'))
                ? 'https://analysis-output.telemetry.mozilla.org/gfx-telemetry/data/'
                : 'data/';
 
@@ -845,12 +846,6 @@ ChartController.prototype.drawWindowsFeatures = function ()
     });
   this.drawPieChart(elt, series);
 
-  if (Object.keys(source.warp).length > 0) {
-    var elt = this.prepareChartDiv('warp-breakdown', 'WARP Fallback Reasons', 600, 300);
-    var series = this.mapToSeries(source.warp);
-    this.drawPieChart(elt, series);
-  }
-
   var elt = this.prepareChartDiv(
     'texture-sharing-breakdown',
     'Direct3D11 Texture Sharing',
@@ -860,6 +855,98 @@ ChartController.prototype.drawWindowsFeatures = function ()
       return (key == "true") ? "Works" : "Doesn't work";
     });
   this.drawPieChart(elt, series);
+}
+
+ChartController.prototype.drawBlacklistingStats = function ()
+{
+  var obj = this.ensureData('windows-features.json', this.drawBlacklistingStats.bind(this));
+  if (!obj)
+    return;
+
+  this.drawSampleInfo(obj);
+
+  // We don't care about the 'unused' status.
+  delete obj.all.d3d11['unused'];
+
+  var elt = this.prepareChartDiv(
+    'd3d11-breakdown',
+    'Direct3D11 Success Rates',
+    600, 300);
+  var series = this.mapToSeries(obj.all.d3d11,
+    function (key) {
+      if (key in D3D11StatusCode)
+        return D3D11StatusCode[key];
+      return key.charAt(0).toUpperCase() + key.substring(1);
+    });
+  this.drawPieChart(elt, series);
+
+  var infoText = 'Blacklist status is reported when one of the following is true: ' +
+                 '(1) Windows Vista or 7 is present (disabling WARP), or ' +
+                 '(2) "nvdxgiwrap.dll" is present.';
+  $('#viewport').append(
+    $("<p></p>").append(
+      $("<strong></strong>").text(infoText)
+    )
+  );
+
+  var elt = this.prepareChartDiv(
+    'blacklist-by-os',
+    'D3D11 Blacklisting, by Windows Version',
+    600, 300);
+  var winvers = {};
+  for (var key in obj.d3d11_blacklist.os)
+    winvers[key] = obj.d3d11_blacklist.os[key];
+  winvers = this.reduce(winvers, 'Other', 0.01, function(key) {
+    return WindowsVersionName(key) != 'Unknown';
+  });
+  var series = this.mapToSeries(winvers, WindowsVersionName);
+  this.drawPieChart(elt, series);
+
+  var elt = this.prepareChartDiv(
+    'blacklist-by-device',
+    'D3D11 Blacklisting, by Device Chipset',
+    600, 300);
+  var data = this.mapToKeyedAgg(obj.d3d11_blacklist.devices,
+    function (key) { return DeviceKeyToPropKey(key, 'chipset'); },
+    function (key) { return DeviceKeyToPropLabel(key, 'chipset'); }
+  );
+  data = this.reduceAgg(data, 0.01, 'other', 'Other');
+  this.drawPieChart(elt, this.aggToSeries(data));
+
+  var elt = this.prepareChartDiv(
+    'blacklist-by-driver',
+    'D3D11 Blacklisting, by Driver',
+    600, 300);
+  var data = this.mapToKeyedAgg(obj.d3d11_blacklist.drivers,
+    function (key) { return key },
+    function (key) {
+      var parts = key.split('/');
+      if (parts.length != 2)
+        return key;
+      return GetVendorName(parts[0]) + ', ' + parts[1];
+    }
+  );
+  data = this.reduceAgg(data, 0.01, 'other', 'Other');
+  this.drawPieChart(elt, this.aggToSeries(data));
+
+  var infoText = 'Blocked status is reported when one of the following is true: ' +
+                 '(1) Safe mode is enabled, or ' +
+                 '(2) Device creation failed and WARP is blocked, or ' +
+                 '(3) An Intel GPU is present and DisplayLink <= 8.6.1.36484 is present.';
+  $('#viewport').append(
+    $("<p></p>").append(
+      $("<strong></strong>").text(infoText)
+    )
+  );
+
+  var elt = this.prepareChartDiv(
+    'blocked-by-vendor',
+    'D3D11 Blocked, by Vendor',
+    600, 300);
+  var data = this.mapToKeyedAgg(obj.d3d11_blocked.vendors,
+    function (key) { return key },
+    GetVendorName);
+  this.drawPieChart(elt, this.aggToSeries(data));
 }
 
 ChartController.prototype.drawStartupData = function ()

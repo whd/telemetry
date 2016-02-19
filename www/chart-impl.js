@@ -208,19 +208,19 @@ ChartDisplay.prototype.drawTable = function(selector, devices)
 
 ChartDisplay.prototype.ensureData = function (key, callback)
 {
-  if (key in this.data && this.data[key].obj)
-    return this.data[key].obj;
+  if (key in this.data) {
+    if (this.data[key].obj)
+      return this.data[key].obj;
 
-  var state = this.data[key];
-  if (!state) {
-    state = {
-      callbacks: [],
-      obj: null,
-    };
-    this.data[key] = state;
+    this.data[key].callbacks.push(callback);
+    return null;
   }
 
-  state.callbacks.push(callback);
+  var state = {
+      callbacks: [callback],
+      obj: null,
+  };
+  this.data[key] = state;
 
   var prefix = (USE_S3_FOR_CHART_DATA &&
                 (key != 'snapshots.json'))

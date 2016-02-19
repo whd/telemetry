@@ -4,7 +4,7 @@ function Controller()
   this.lastHash = null;
   this.queryParams = {};
   this.view = null;
-  this.charts = new ChartController(this);
+  this.charts = new ChartDisplay(this);
   this.ignoreHashChange = false;
   this.queryHooks = {};
   this.filters = [];

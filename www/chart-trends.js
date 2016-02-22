@@ -24,11 +24,12 @@ ChartDisplay.prototype.plotPercentageTrend = function (elt, points, options)
       var trend = trends[key];
       if (!trend) {
         totalsMap[key] = 0;
-        trend = (trends[key] = []);
+        trend = (trends[key] = {line: [], raw: []});
       }
 
       totalsMap[key] += data[key];
-      trend.push([point.start * 1000, (data[key] / point.total) * 100]);
+      trend.line.push([point.start * 1000, (data[key] / point.total) * 100]);
+      trend.raw.push({ point: point, count: data[key] });
     }
     total += point.total;
   }
@@ -39,7 +40,8 @@ ChartDisplay.prototype.plotPercentageTrend = function (elt, points, options)
       // Note: we shove the index into the label, since the legend sorting
       // function doesn't have access to the series object.
       label: labelFn(key),
-      data: trends[key],
+      data: trends[key].line,
+      info: trends[key].raw,
 
       // Custom - used in the sorted callback.
       gfxTotal: totalsMap[key],
@@ -73,6 +75,7 @@ ChartDisplay.prototype.plotPercentageTrend = function (elt, points, options)
     var label = series[item.seriesIndex].label;
     var value = item.datapoint[1].toFixed(2);
     var date = new Date(item.datapoint[0]);
+    var info = series[item.seriesIndex].info[item.dataIndex];
     try {
       var dateString = date.toLocaleDateString(undefined, {
         formatMatcher: 'best fit',
@@ -83,8 +86,10 @@ ChartDisplay.prototype.plotPercentageTrend = function (elt, points, options)
     } catch (e) {
       var dateString = date.toString();
     }
-    var text = 'Week of ' + dateString + '<br/>' +
-               label + ': ' + value + '%';
+    var text = label + ': ' + 'Week of ' + dateString + '<br/>' +
+               value + '% (' +
+                  info.count.toLocaleString() + ' out of ' +
+                  info.point.total.toLocaleString() + ' sessions sampled)';
     return text;
   }).bind(this));;
 

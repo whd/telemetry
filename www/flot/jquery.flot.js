@@ -2733,7 +2733,8 @@ Licensed under the MIT license.
                     if (label) {
                         entries.push({
                             label: label,
-                            color: s.color
+                            color: s.color,
+                            series: s
                         });
                     }
                 }

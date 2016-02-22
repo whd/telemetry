@@ -1,8 +1,8 @@
 // vim: set ts=2 sw=2 tw=99 et:
-function ToolTip(id, label, contents)
+function ToolTip(owner, id, contents)
 {
+  this.owner = owner;
   this.id = id;
-  this.label = label;
   this.contents = contents;
   this.elt = null;
 }
@@ -10,7 +10,7 @@ function ToolTip(id, label, contents)
 ToolTip.prototype.draw = function(x, y)
 {
   var elt = $("<div class='tooltip'></div>");
-  elt.text(this.contents);
+  elt.html(this.contents);
   this.present(x, y, elt);
 }
 

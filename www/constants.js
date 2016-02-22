@@ -84,6 +84,31 @@ function GetDarwinVersion(version)
   return '10.' + (major - 4);
 }
 
+var ImportantWindowsVersions = {
+  '5.1': true,
+  '6.0': true,
+  '6.1.0': true,
+  '6.1.1': true,
+  '6.2': true,
+  '6.3': true,
+  '10.0': true,
+};
+
+// Reduce the Windows version number to eliminate unimportant version differences.
+function ReduceWindowsVersion(key)
+{
+  var maj = key.substring(0, 3);
+  switch (maj) {
+    case '5.1':
+    case '6.0':
+    case '6.2':
+    case '6.3':
+    case '10.0':
+      return maj;
+  }
+  return key;
+}
+
 function GetOSName(key)
 {
   var parts = key.split('-');

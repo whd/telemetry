@@ -7,6 +7,7 @@ function ChartDisplay(app)
   this.activeHover = null;
   this.data = {};
 }
+var CD = ChartDisplay;
 
 ChartDisplay.prototype.clear = function()
 {
@@ -30,17 +31,33 @@ ChartDisplay.prototype.removeHover = function()
   this.activeHover = null;
 }
 
-ChartDisplay.prototype.prepareChartDiv = function (id, title, width, height)
+ChartDisplay.prototype.prepareChartDiv = function (id, title, width, height, wmargin)
 {
+  var container = $('<div/>', {
+    width: width + (wmargin | 0),
+    height: height
+  });
   var elt = $('<div/>', {
     id: id,
     width: width,
     height: height
-  });
+  }).css('float', 'left')
+    .appendTo(container);
+
+  if (wmargin !== undefined) {
+    $('<div/>', {
+      id: id + '-legend',
+      height: height
+    }).appendTo(container);
+  }
+  $('<div/>')
+    .css('clear', 'both')
+    .appendTo(container);
+
   $('#viewport').append(
     $('<h4></h4>').text(title)
   );
-  $('#viewport').append(elt);
+  $('#viewport').append(container);
   $('#viewport').append($('<br>'));
   $('#viewport').append($('<br>'));
   return elt;
@@ -98,22 +115,30 @@ ChartDisplay.prototype.drawChart = function (type, elt, data, aOptions)
   }
 
   $.plot(elt, dataset, options);
-  elt.bind('plothover', (function (event, pos, obj) {
-    if (!obj) {
+  this.bindHover(elt, (function (event, pos, item) {
+    var item = data.labels[obj.dataIndex];
+    var value = data.series[obj.dataIndex][1];
+    var text = item + " - " + data.formatter(value.toFixed(2));
+    return text;
+  }).bind(this));
+}
+
+ChartDisplay.prototype.bindHoverDraw = function (elt, callback)
+{
+  elt.bind('plothover', (function (event, pos, item) {
+    if (!item) {
       this.removeHover();
       return;
     }
+
     if (this.activeHover) {
-      if (this.activeHover.id == event.target && this.activeHover.label == obj.seriesIndex)
+      if (this.activeHover.owner == event.target && this.activeHover.id == item.seriesIndex)
         return;
       this.removeHover();
     }
 
-    var item = data.labels[obj.dataIndex];
-    var value = data.series[obj.dataIndex][1];
-    var text = item + " - " + data.formatter(value.toFixed(2));
-
-    this.activeHover = new ToolTip(event.target, obj.seriesIndex, text);
+    var text = callback(event, pos, item);
+    this.activeHover = new ToolTip(event.target, item.seriesIndex, text);
     this.activeHover.draw(pos.pageX, pos.pageY);
   }).bind(this));
 }
@@ -206,6 +231,23 @@ ChartDisplay.prototype.drawTable = function(selector, devices)
   $(selector).append(table);
 }
 
+ChartDisplay.prototype.prefetch = function (keys)
+{
+  if (Array.isArray(keys)) {
+    for (var i = 0; i < keys.length; i++)
+      this.ensureData(keys[i], function () {});
+  } else {
+    this.ensureData(keys, function () {});
+  }
+}
+
+ChartDisplay.prototype.onFetch = function (key, callback)
+{
+  var obj = this.ensureData(key, callback);
+  if (obj !== null)
+    callback(obj);
+}
+
 ChartDisplay.prototype.ensureData = function (key, callback)
 {
   if (key in this.data) {
@@ -223,7 +265,7 @@ ChartDisplay.prototype.ensureData = function (key, callback)
   this.data[key] = state;
 
   var prefix = (USE_S3_FOR_CHART_DATA &&
-                (key != 'snapshots.json'))
+                (key.substr(0, 6) != 'trend-'))
                ? 'https://analysis-output.telemetry.mozilla.org/gfx-telemetry/data/'
                : 'data/';
 
@@ -240,7 +282,39 @@ ChartDisplay.prototype.ensureData = function (key, callback)
 
     for (var i = 0; i < callbacks.length; i++)
       callbacks[i](state.obj);
+  }).error(function (xhr, textStatus, errorThrown) {
+    console.log(textStatus);
+    console.log(errorThrown);
   });
+}
+
+// Collapse a map of (key -> amount) based on a key transform, then collapse
+// small values based on a threshold.
+CD.CollapseMap = function (data, total, threshold, keyFn)
+{
+  // New map based on key transform.
+  var newData = {};
+  for (var key in data) {
+    var newKey = keyFn(key);
+    if (!(newKey in newData))
+      newData[newKey] = 0;
+    newData[newKey] += data[key];
+  }
+
+  // Remove small values.
+  for (var key in newData) {
+    if (key == 'other')
+      continue;
+
+    if ((newData[key] / total) < threshold) {
+      if (!('other' in newData))
+        newData['other'] = 0;
+      newData['other'] += newData[key];
+      delete newData[key];
+    }
+  }
+
+  return newData;
 }
 
 // Combine unknown keys into one key, aggregating it.
@@ -445,3 +519,7 @@ ChartDisplay.prototype.drawSampleInfo = function (obj)
       chart_div
   );
 };
+
+function SeriesBuilder()
+{
+}

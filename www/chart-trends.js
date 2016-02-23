@@ -99,10 +99,25 @@ ChartDisplay.prototype.plotPercentageTrend = function (elt, points, options)
 ChartDisplay.prototype.drawTrends = function ()
 {
   this.prefetch([
+    'trend-firefox.json',
     'trend-windows-versions.json',
     'trend-windows-compositors.json',
     'trend-windows-arch.json',
+    'trend-windows-d3d11.json',
+    'trend-windows-d2d.json',
+    'trend-windows-vendors.json',
   ]);
+
+  /*
+  var fxversion_elt = this.prepareChartDiv(
+    'firefox-versions-trend',
+    'Firefox Versions',
+    800, 300, 150);
+  this.onFetch('trend-firefox.json', (function (obj) {
+    this.plotPercentageTrend(fxversion_elt, obj.trend, {
+    });
+  }).bind(this));
+  */
 
   var winver_elt = this.prepareChartDiv(
     'windows-versions-trend',
@@ -150,6 +165,82 @@ ChartDisplay.prototype.drawTrends = function ()
         }
         return key;
       }
+    });
+  }).bind(this));
+
+  var d3d11_elt = this.prepareChartDiv(
+    'd3d11-trend',
+    'Direct3D 11 Trends',
+    750, 300, 200);
+  this.onFetch('trend-windows-d3d11.json', (function (obj) {
+    this.plotPercentageTrend(d3d11_elt, obj.trend, {
+      gfxLabelFn: function (key) {
+        if (key in D3D11StatusCode)
+          return D3D11StatusCode[key];
+        switch (key) {
+          case 'blacklisted': return 'Blacklisted';
+          case 'blocked': return 'Blocked (DirectLink)';
+          case 'disabled': return 'Disabled';
+          case 'failed': return 'Failed';
+          case 'unavailable': return 'Unavailable';
+          case 'crashed': return 'Crashed';
+        }
+        return key;
+      },
+      gfxPreprocess: function (point, data) {
+        delete data['unknown'];
+        delete data['other'];
+        return CD.CollapseMap(data, point.total, 0, function (key) {
+          if (key == 'unused')
+            return 'other';
+          return key;
+        });
+      }.bind(this),
+    });
+  }).bind(this));
+
+  var d2d_elt = this.prepareChartDiv(
+    'd2d-trend',
+    'Direct2D Trends',
+    800, 300, 150);
+  this.onFetch('trend-windows-d2d.json', (function (obj) {
+    this.plotPercentageTrend(d2d_elt, obj.trend, {
+      gfxLabelFn: function (key) {
+        switch (key) {
+          case '1.1':
+          case '1.0':
+            return 'Direct2D ' + key;
+          case 'blacklisted': return 'Blacklisted';
+          case 'failed': return 'Failed';
+          case 'unavailable': return 'Unavailable';
+          case 'blocked': return 'Blocked (WARP)';
+          case 'disabled': return 'Disabled';
+        }
+        return key;
+      },
+      gfxPreprocess: function (point, data) {
+        delete data['unknown'];
+        return data;
+      },
+    });
+  }).bind(this));
+
+  var winvendor_elt = this.prepareChartDiv(
+    'windows-vendor-trend',
+    'Graphics Vendors, Windows',
+    800, 300, 150)
+  this.onFetch('trend-windows-vendors.json', (function (obj) {
+    this.plotPercentageTrend(winvendor_elt, obj.trend, {
+      gfxLabelFn: function (key) {
+        if (key == 'other')
+          return 'Other';
+        return GetVendorName(key);
+      },
+      gfxPreprocess: function (point, data) {
+        return CD.CollapseMap(data, point.total, 0.005, function (key) {
+          return (key in VendorMap) ? key : 'other';
+        });
+      },
     });
   }).bind(this));
 }

@@ -6,6 +6,7 @@ DatabaseRoot = "https://raw.githubusercontent.com/jrmuizel/gpu-db/master/"
 
 def main():
   parser = argparse.ArgumentParser()
+  parser.add_argument('mode', type=str, help='Mode (json or js)')
   args = parser.parse_args()
 
   output = {}
@@ -20,8 +21,11 @@ def main():
     obj = json.loads(req.read())
     parse(output, obj)
 
-  x = json.dumps(output, indent=1)
-  print('var GfxDeviceMap = ' + x + ';');
+  x = json.dumps(output)
+  if args.mode == 'json':
+    print(x)
+  elif args.mode == 'js':
+    print('var GfxDeviceMap = ' + x + ';')
 
 def parse(output, obj):
   for vendor in obj:

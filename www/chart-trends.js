@@ -108,16 +108,17 @@ ChartDisplay.prototype.drawTrends = function ()
     'trend-windows-vendors.json',
   ]);
 
-  /*
   var fxversion_elt = this.prepareChartDiv(
     'firefox-versions-trend',
     'Firefox Versions',
     800, 300, 150);
   this.onFetch('trend-firefox.json', (function (obj) {
     this.plotPercentageTrend(fxversion_elt, obj.trend, {
+      gfxLabelFn: function (key) {
+        return 'Firefox ' + key;
+      }
     });
   }).bind(this));
-  */
 
   var winver_elt = this.prepareChartDiv(
     'windows-versions-trend',

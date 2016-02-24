@@ -106,6 +106,9 @@ ChartDisplay.prototype.drawTrends = function ()
     'trend-windows-d3d11.json',
     'trend-windows-d2d.json',
     'trend-windows-vendors.json',
+    'trend-windows-device-gen-amd.json',
+    'trend-windows-device-gen-intel.json',
+    'trend-windows-device-gen-nvidia.json',
   ]);
 
   var fxversion_elt = this.prepareChartDiv(
@@ -244,4 +247,22 @@ ChartDisplay.prototype.drawTrends = function ()
       },
     });
   }).bind(this));
+
+  var vendors = [
+    { name: 'Intel', nick: 'intel' },
+    { name: 'NVIDIA', nick: 'nvidia' },
+    { name: 'ATI', nick: 'amd' },
+  ];
+  for (var i = 0; i < vendors.length; i++) {
+    // So we can close over loop vars.
+    ((function (vendor) {
+      var elt = this.prepareChartDiv(
+        'windows-vendor-gen-trend-' + vendor.nick,
+        vendor.name + ' Device Generations, Windows',
+        800, 300, 150)
+      this.onFetch('trend-windows-device-gen-' + vendor.nick + '.json', (function (obj) {
+        this.plotPercentageTrend(elt, obj.trend, {});
+      }).bind(this));
+    }).bind(this))(vendors[i]);
+  }
 }

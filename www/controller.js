@@ -149,9 +149,6 @@ Controller.prototype.changeView = function (view)
     case 'sanity':
       this.charts.drawSanityTests();
       break;
-    case 'testcrashes':
-      this.charts.drawTestCrashes();
-      break;
     case 'startup':
       this.charts.drawStartupData();
       break;
@@ -161,14 +158,8 @@ Controller.prototype.changeView = function (view)
     case 'monitors':
       this.charts.drawMonitors();
       break;
-    case 'apz':
-      this.charts.drawAPZ();
-      break;
     case 'hwsearch':
       this.charts.displayHardwareSearch();
-      break;
-    case 'snapshots':
-      this.charts.drawSnapshots();
       break;
     case 'system':
       this.charts.drawSystem();

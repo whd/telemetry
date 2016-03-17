@@ -141,98 +141,6 @@ ChartDisplay.prototype.drawGeneral = function ()
   dev_chipsets.render();
 }
 
-ChartDisplay.prototype.drawCrashReports = function (inReports)
-{
-  var reports = [];
-  for (var i = 0; i < inReports.length; i++) {
-    if (!inReports[i].date)
-      continue;
-    if (!inReports[i].timestamp)
-      inReports[i].timestamp = Date.parse(inReports[i].date);
-    reports.push(inReports[i]);
-  }
-  reports.sort(function (a, b) {
-    return b.timestamp - a.timestamp;
-  });
-
-  $('#viewport').append(
-    $("<h2></h2>").text("Crash Reports")
-  );
-
-  for (var i = 0; i < reports.length; i++) {
-    var report = reports[i];
-    var date = new Date(report.date);
-    $('#viewport').append(
-      $("<p></p>").append(
-        $("<strong></strong>").text("Date: "),
-        $("<span></span>").text(date.toLocaleDateString())
-      )
-    );
-
-    var ul = $('<ul></ul>');
-
-    var ostext = (report.os.name in OSMap
-                 ? OSMap[report.os.name]
-                 : report.os.name);
-    if (report.os.version) {
-      ostext += " " + report.os.version;
-      if (report.os.servicePack)
-        ostext += " (SP " + report.os.servicePack + ")";
-    } else {
-      ostext += " (unknown version)";
-    }
-    ul.append($('<li></li>').text("Operating System: " + ostext));
-
-    var build = $('<li></li>').text("Build:");
-    build.append(
-      $('<ul></ul>').append(
-        $('<li></li>').text('Version: ' + report.build.version),
-        $('<li></li>').text('Revision: ').append(
-          $('<a>').text(report.build.revision)
-                  .attr('href', report.build.revision)
-        )
-      )
-    );
-    ul.append(build);
-
-    var adapter = $('<ul></ul>');
-    var vendorText = report.adapter.vendorID;
-    if (report.adapter.vendorID in VendorMap)
-      vendorText += " (" + VendorMap[report.adapter.vendorID] + ")";
-    else
-      vendorText += " (unknown vendor)";
-    var deviceText = report.adapter.deviceID;
-    var fullDeviceID = report.adapter.vendorID + "/" + report.adapter.deviceID;
-    if (fullDeviceID in PCIDeviceMap)
-      deviceText += " (" + PCIDeviceMap[fullDeviceID] + ")";
-    else
-      deviceText += " (not in PCI database)";
-
-    adapter.append(
-      $('<li></li>').text('Description: ' + report.adapter.description),
-      $('<li></li>').text('Vendor: ' + vendorText),
-      $('<li></li>').text('Device: ' + deviceText),
-      $('<li></li>').text('Driver: ' +
-                           report.adapter.driverVersion +
-                           ' (date: ' + report.adapter.driverDate + ')'),
-      $('<li></li>').text('Subsystem ID: ' + report.adapter.subsysID),
-      $('<li></li>').text('RAM: ' + (report.adapter.RAM ? report.adapter.RAM : "unknown"))
-    );
-    ul.append($('<li></li>').text('Adapter:').append(adapter));
-
-    if (report.snapshot) {
-      var canvas = $('<canvas></canvas>');
-      var ctx = canvas[0].getContext('2d');
-      var image = new Image();
-      image.src = report.snapshot;
-      ctx.drawImage(image, 0, 0);
-      ul.append($('<li></li>').text('Snapshot:').append(canvas));
-    }
-
-    $('#viewport').append(ul);
-  }
-};
-
 ChartDisplay.prototype.drawMonitors = function ()
 {
   var obj = this.ensureData('monitor-statistics.json', this.drawMonitors.bind(this));
@@ -534,53 +442,6 @@ ChartDisplay.prototype.drawStartupData = function ()
     }
   );
   this.drawPieChart(elt, series);
-
-  this.drawCrashReports(obj.reports);
-}
-
-ChartDisplay.prototype.drawSnapshots = function ()
-{
-  var obj = this.ensureData('snapshots.json', this.drawSnapshots.bind(this));
-  if (!obj)
-    return;
-
-  var startAt = this.app.getParam('startAt', 0) | 0;
-  var slice = obj.slice(startAt, startAt + 500);
-
-  this.drawCrashReports(slice);
-}
-
-ChartDisplay.prototype.drawTestCrashes = function ()
-{
-  var obj = this.ensureData('sanity-test-crash-reports.json', this.drawTestCrashes.bind(this));
-  if (!obj)
-    return;
-
-  this.drawSampleInfo(obj);
-
-  var sanityTestInfoText =
-    obj.sanityTestPings + " (" +
-    this.toPercent(obj.sanityTestPings / obj.sessions.count) + "% " +
-    "of sessions)";
-  var crashInfoText =
-    obj.reports.length + " (" +
-    this.toPercent(obj.reports.length / obj.sanityTestPings) + "% " +
-    "of sanity test runs)";
-
-  $("#viewport").append(
-      $("<p></p>").append(
-        $("<strong></strong>").text("Number of sanity tests attempted: ")
-      ).append(
-        $("<span></span>").text(sanityTestInfoText)
-      ),
-      $("<p></p>").append(
-        $("<strong></strong>").text("Number of sanity test crashes: ")
-      ).append(
-        $("<span></span>").text(crashInfoText)
-      )
-  );
-
-  this.drawCrashReports(obj.reports);
 }
 
 ChartDisplay.prototype.drawSanityTests = function ()
@@ -899,56 +760,6 @@ ChartDisplay.prototype.drawSystem = function ()
 
   var elt = this.prepareChartDiv('arches', 'x86/64 CPU Features', 500, 300);
   this.drawChart('bar', elt, data, { yaxis: { max: 100 }});
-}
-
-ChartDisplay.prototype.drawAPZ = function ()
-{
-  var obj = this.ensureData('apz-statistics.json', this.drawAPZ.bind(this));
-  if (!obj)
-    return;
-
-  this.drawSampleInfo(obj);
-
-  var apzText = obj.disabled + ' (' +
-                this.toPercent(obj.disabled / obj.sessions.count) + '%)';
-
-  $("#viewport").append(
-      $("<p></p>").append(
-        $("<strong></strong>").text("Sessions with APZ disabled: ")
-      ).append(
-        $("<span></span>").text(apzText)
-      )
-  );
-
-  var os = {};
-  for (var key in obj.byOS) {
-    var new_key = GetOSName(key);
-    if (new_key in os)
-      os[new_key] += obj.byOS[key];
-    else
-      os[new_key] = obj.byOS[key];
-  }
-
-  var elt = this.prepareChartDiv(
-      'apz-disabled-os',
-      'APZ Disabled, by OS',
-      600, 300);
-  var series = this.mapToSeries(os);
-  this.drawPieChart(elt, series);
-
-  var elt = this.prepareChartDiv(
-      'apz-disabled-res',
-      'APZ Disabled, by Resolution',
-      600, 300);
-  var series = this.mapToSeries(obj.byResolution);
-  this.drawPieChart(elt, series);
-
-  var elt = this.prepareChartDiv(
-      'apz-disabled-device',
-      'APZ Disabled, by Device',
-      600, 300);
-  var series = this.mapToSeries(obj.byDevice, GetDeviceName);
-  this.drawPieChart(elt, series);
 }
 
 ChartDisplay.prototype.drawMacStats = function ()

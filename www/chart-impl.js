@@ -264,6 +264,7 @@ ChartDisplay.prototype.ensureData = function (key, callback)
   };
   this.data[key] = state;
 
+  // :TODO: trend data is not yet automated.
   var prefix = (USE_S3_FOR_CHART_DATA &&
                 (key.substr(0, 6) != 'trend-'))
                ? 'https://analysis-output.telemetry.mozilla.org/gfx-telemetry/data/'

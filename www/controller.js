@@ -173,6 +173,10 @@ Controller.prototype.changeView = function (view)
     case 'trends':
       this.charts.drawTrends();
       break;
+    case 'webgl1':
+    case 'webgl2':
+      this.charts.drawWebGL(this.view);
+      break;
     case 'about':
       this.displayAbout();
       break;

@@ -368,28 +368,13 @@ ChartDisplay.prototype.drawBlacklistingStats = function ()
     'blacklist-by-device',
     'D3D11 Blacklisting, by Device Chipset',
     600, 300);
-  var data = this.mapToKeyedAgg(obj.d3d11_blacklist.devices,
-    function (key) { return DeviceKeyToPropKey(key, 'chipset'); },
-    function (key) { return DeviceKeyToPropLabel(key, 'chipset'); }
-  );
-  data = this.reduceAgg(data, 0.01, 'other', 'Other');
-  this.drawPieChart(elt, this.aggToSeries(data));
+  this.drawPieChart(elt, this.buildChipsetSeries(obj.d3d11_blacklist.devices, 0.01));
 
   var elt = this.prepareChartDiv(
     'blacklist-by-driver',
     'D3D11 Blacklisting, by Driver',
     600, 300);
-  var data = this.mapToKeyedAgg(obj.d3d11_blacklist.drivers,
-    function (key) { return key },
-    function (key) {
-      var parts = key.split('/');
-      if (parts.length != 2)
-        return key;
-      return GetVendorName(parts[0]) + ', ' + parts[1];
-    }
-  );
-  data = this.reduceAgg(data, 0.01, 'other', 'Other');
-  this.drawPieChart(elt, this.aggToSeries(data));
+  this.drawPieChart(elt, this.buildDriverSeries(obj.d3d11_blacklist.drivers, 0.01));
 
   var infoText = 'Blocked status is reported when one of the following is true: ' +
                  '(1) Safe mode is enabled, or ' +

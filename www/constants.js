@@ -25,11 +25,6 @@ function GetVendorName(code)
   return 'Unknown vendor ' + code;
 }
 
-var OSMap = {
-  'Windows_NT': 'Windows',
-  'Darwin': 'Mac OS X',
-};
-
 var MajorVendors = [
   '0x8086',
   '0x1002',
@@ -75,13 +70,18 @@ function WindowsVersionName(code)
     return 'Unknown';
   return 'Windows ' + version;
 }
-function GetDarwinVersion(version)
+function MacVersionName(version)
 {
   var parts = version.split('.');
-  var major = parseInt(parts[0]);
-  if (!major || major < 5)
-    return null;
-  return '10.' + (major - 4);
+  if (parts.length < 2)
+    return 'Mac OS X Unknown';
+
+  var key = parts[0] + '.' + parts[1];
+  var osx_version = DarwinVersionToOSX(version);
+  if (osx_version in OSXNameMap)
+    return 'OS X ' + OSXNameMap[osx_version];
+
+  return 'Mac OS X ' + osx_version;
 }
 
 var ImportantWindowsVersions = {
@@ -97,7 +97,11 @@ var ImportantWindowsVersions = {
 // Reduce the Windows version number to eliminate unimportant version differences.
 function ReduceWindowsVersion(key)
 {
-  var maj = key.substring(0, 3);
+  var parts = key.split('.');
+  if (parts.length < 2)
+    return key;
+
+  var maj = parts[0] + '.' + parts[1];
   switch (maj) {
     case '5.1':
     case '6.0':
@@ -109,28 +113,53 @@ function ReduceWindowsVersion(key)
   return key;
 }
 
+function ReduceDarwinVersion(key)
+{
+  var parts = key.split('.');
+  if (parts.length >= 2)
+    return parts[0] + '.' + parts[1];
+  return key;
+}
+
+// Reduce an operating system version number. If the version number is
+// unimportant, this returns a new key to fold its data into.
+//
+// Input must in the form <OS>-<Version>.
+function ReduceOSVersion(key)
+{
+  var parts = key.split('-');
+  if (parts.length != 2) {
+    if (key == 'Linux')
+      return 'Linux';
+    return 'unknown';
+  }
+  switch (parts[0]) {
+  case 'Windows':
+    return 'Windows-' + ReduceWindowsVersion(parts[1]);
+  case 'Linux':
+    return 'Linux';
+  case 'Darwin':
+    return 'Darwin-' + ReduceDarwinVersion(parts[1]);
+  default:
+    return 'unknown';
+  }
+}
+
+// Input: <OS>-<Version>
+// Output: "OS Version (pretty-name)"
 function GetOSName(key)
 {
   var parts = key.split('-');
-  if (parts.length == 0)
-    return 'Unknown';
+  if (parts.length != 2)
+    return parts[0];
 
-  var version = null;
   switch (parts[0]) {
     case 'Darwin':
-      if (parts.length >= 2)
-        version = GetDarwinVersion(parts[1]);
-      if (!version)
-        return 'Mac OS X (Unknown)';
-      return 'Mac OS X ' + version;
+      return MacVersionName(parts[1]);
     case 'Windows':
-      if (parts.length >= 2)
-        version = WindowsVersionName(parts[1]);
-      if (!version)
-        return 'Windows (Unknown)';
-      return version;
+      return WindowsVersionName(parts[1]);
     default:
-      return parts[0] + ' ' + parts.slice(1).join('-');
+      return key;
   }
 }
 
@@ -233,7 +262,7 @@ function DarwinVersionToOSX(darwin_version)
 function DarwinVersionToOSXFull(darwin_version)
 {
   var parts = darwin_version.split('.');
-  if (parts.length < 2 || isNaN(parts[0]) || isNaN(parts[1]) || isNaN(parts[2]))
+  if (parts.length < 2 || isNaN(parts[0]) || isNaN(parts[1]))
     return 'unknown';
   var major = parseInt(parts[0]);
   if (!(major >= 4))

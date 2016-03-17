@@ -12,7 +12,7 @@ var CD = ChartDisplay;
 ChartDisplay.prototype.clear = function()
 {
   this.removeHover();
-  
+
   // Clear callbacks for XHR.
   for (var key in this.data) {
     var state = this.data[key];
@@ -248,7 +248,15 @@ ChartDisplay.prototype.onFetch = function (key, callback)
     callback(obj);
 }
 
-ChartDisplay.prototype.ensureData = function (key, callback)
+ChartDisplay.prototype.makeDataURL = function (name, useS3)
+{
+  var prefix = useS3
+               ? 'https://analysis-output.telemetry.mozilla.org/gfx-telemetry/data/'
+               : 'data/';
+  return prefix + name;
+}
+
+ChartDisplay.prototype.ensureDataImpl = function (key, callback, useS3)
 {
   if (key in this.data) {
     if (this.data[key].obj)
@@ -264,16 +272,7 @@ ChartDisplay.prototype.ensureData = function (key, callback)
   };
   this.data[key] = state;
 
-  // :TODO: trend data is not yet automated.
-  var prefix = (USE_S3_FOR_CHART_DATA &&
-                (key.substr(0, 6) != 'trend-'))
-               ? 'https://analysis-output.telemetry.mozilla.org/gfx-telemetry/data/'
-               : 'data/';
-
-  $.ajax({
-    url: prefix + key,
-    dataType: 'json',
-  }).done(function (data) {
+  var onSuccess = function (data) {
     state.obj = (typeof data == 'string')
                 ? JSON.parse(data)
                 : data;
@@ -283,16 +282,49 @@ ChartDisplay.prototype.ensureData = function (key, callback)
 
     for (var i = 0; i < callbacks.length; i++)
       callbacks[i](state.obj);
-  }).error(function (xhr, textStatus, errorThrown) {
+  };
+  var onError = function (xhr, textStatus, errorThrown) {
     console.log(textStatus);
     console.log(errorThrown);
-  });
+  }
+  var maybeRetry = (function (xhr, textStatus, errorThrown) {
+    if (useS3) {
+      // Try again without S3, we may have a cached old copy.
+      $.ajax({
+        url: this.makeDataURL(key, false),
+        dataType: 'json',
+      }).done(function (data) {
+        console.log('Warning: fetched ' + key + ' from old copy, rather than S3')
+        onSuccess(data);
+      }).error(onError);
+      return;
+    }
+    onError(xhr, textStatus, errorThrown);
+  }).bind(this);
+
+  $.ajax({
+    url: this.makeDataURL(key, useS3),
+    dataType: 'json',
+  })
+  .done(onSuccess)
+  .error(maybeRetry);
+}
+
+ChartDisplay.prototype.ensureData = function (key, callback)
+{
+  // :TODO: trend data is not yet automated.
+  var useS3 = (USE_S3_FOR_CHART_DATA &&
+               (key.substr(0, 6) != 'trend-'));
+
+  return this.ensureDataImpl(key, callback, useS3);
 }
 
 // Collapse a map of (key -> amount) based on a key transform, then collapse
 // small values based on a threshold.
 CD.CollapseMap = function (data, total, threshold, keyFn)
 {
+  var computed_total = 0;
+
   // New map based on key transform.
   var newData = {};
   for (var key in data) {
@@ -300,7 +332,11 @@ CD.CollapseMap = function (data, total, threshold, keyFn)
     if (!(newKey in newData))
       newData[newKey] = 0;
     newData[newKey] += data[key];
+    computed_total += data[key];
   }
+
+  if (total === undefined)
+    total = computed_total;
 
   // Remove small values.
   for (var key in newData) {
@@ -444,6 +480,44 @@ ChartDisplay.prototype.toPercent = function (val)
   return parseFloat((val * 100).toFixed(2));
 }
 
+// :TODO: Transition previous OS-mapping callers to this function.
+ChartDisplay.prototype.buildOSSeries = function (aData, threshold)
+{
+  var data = CD.CollapseMap(aData, undefined, threshold, ReduceOSVersion);
+  return this.mapToSeries(data, function (key) {
+    if (key == 'unknown')
+      return 'Unknown';
+    if (key == 'other')
+      return 'Other';
+    return GetOSName(key);
+  });
+}
+
+ChartDisplay.prototype.buildChipsetSeries = function (aData, threshold)
+{
+  var data = this.mapToKeyedAgg(aData,
+    function (key) { return DeviceKeyToPropKey(key, 'chipset'); },
+    function (key) { return DeviceKeyToPropLabel(key, 'chipset'); }
+  );
+  data = this.reduceAgg(data, threshold, 'other', 'Other');
+  return this.aggToSeries(data);
+}
+
+ChartDisplay.prototype.buildDriverSeries = function (aData, threshold)
+{
+  var data = this.mapToKeyedAgg(aData,
+    function (key) { return key },
+    function (key) {
+      var parts = key.split('/');
+      if (parts.length != 2)
+        return key;
+      return GetVendorName(parts[0]) + ', ' + parts[1];
+    }
+  );
+  data = this.reduceAgg(data, threshold, 'other', 'Other');
+  return this.aggToSeries(data);
+}
+
 ChartDisplay.prototype.drawSampleInfo = function (obj)
 {
   var info_div = $("<div/>")
@@ -520,7 +594,3 @@ ChartDisplay.prototype.drawSampleInfo = function (obj)
       chart_div
   );
 };
-
-function SeriesBuilder()
-{
-}

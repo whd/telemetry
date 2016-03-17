@@ -390,10 +390,7 @@ ChartDisplay.prototype.drawBlacklistingStats = function ()
     'blocked-by-vendor',
     'D3D11 Blocked, by Vendor',
     600, 300);
-  var data = this.mapToKeyedAgg(obj.d3d11_blocked.vendors,
-    function (key) { return key },
-    GetVendorName);
-  this.drawPieChart(elt, this.aggToSeries(data));
+  this.drawPieChart(elt, this.buildVendorSeries(obj.d3d11_blocked.vendors, 0.005));
 }
 
 ChartDisplay.prototype.drawStartupData = function ()

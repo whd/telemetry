@@ -499,6 +499,15 @@ ChartDisplay.prototype.buildOSSeries = function (aData, threshold)
   });
 }
 
+ChartDisplay.prototype.buildVendorSeries = function (aData, threshold)
+{
+  var data = this.mapToKeyedAgg(aData,
+    function (key) { return key },
+    GetVendorName);
+  data = this.reduceAgg(data, threshold, 'other', 'Other');
+  return this.aggToSeries(data);
+}
+
 ChartDisplay.prototype.buildChipsetSeries = function (aData, threshold)
 {
   var data = this.mapToKeyedAgg(aData,

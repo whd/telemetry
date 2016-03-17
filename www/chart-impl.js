@@ -1,6 +1,12 @@
 // vim: set ts=2 sw=2 tw=99 et:
 var USE_S3_FOR_CHART_DATA = true;
 
+// These are files that may not be in S3 yet since the analysis is new. Once
+// they're here, they should be removed from this map.
+var RETRY_IF_NOT_IN_S3 = {
+  'webgl-statistics.json': true
+};
+
 function ChartDisplay(app)
 {
   this.app = app;
@@ -288,7 +294,7 @@ ChartDisplay.prototype.ensureDataImpl = function (key, callback, useS3)
     console.log(errorThrown);
   }
   var maybeRetry = (function (xhr, textStatus, errorThrown) {
-    if (useS3) {
+    if (useS3 && RETRY_IF_NOT_IN_S3[key]) {
       // Try again without S3, we may have a cached old copy.
       $.ajax({
         url: this.makeDataURL(key, false),

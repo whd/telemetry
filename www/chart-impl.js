@@ -461,6 +461,8 @@ ChartDisplay.prototype.listToSeries = function (input, namer)
 {
   var series = [];
   for (var i = 0; i < input.length; i++) {
+    if (input[i] == 0)
+      continue;
     series.push({
       label: namer(i),
       data: input[i],

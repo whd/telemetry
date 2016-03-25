@@ -309,6 +309,28 @@ ChartDisplay.prototype.drawWindowsFeatures = function ()
   this.drawPieChart(elt, series);
 
   var elt = this.prepareChartDiv(
+    'windows-plugin-drawing-models',
+    'Plugin Drawing Modes Used',
+    600, 300);
+  var map = {
+    'Windowed': source.plugin_models[0],
+    'Windowless': 0,
+  };
+  for (var i = 1; i < source.plugin_models.length; i++)
+    map.Windowless += source.plugin_models[i];
+  var series = this.mapToSeries(map);
+  this.drawPieChart(elt, series);
+
+  var elt = this.prepareChartDiv(
+    'windows-windowless-plugin-drawing-models',
+    'Windowless Plugin Drawing Models Used',
+    600, 300);
+  var series = this.listToSeries(source.plugin_models.slice(1), function (index) {
+    return PluginDrawingModels[index + 1];
+  });
+  this.drawPieChart(elt, series);
+
+  var elt = this.prepareChartDiv(
     'texture-sharing-breakdown',
     'Direct3D11 Texture Sharing',
     600, 300);

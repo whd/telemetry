@@ -324,3 +324,16 @@ function DeviceKeyToPropLabel(device_key, prop)
     return 'Unrecognized';
   return VendorMap[vendor] + " " + props[prop];
 }
+
+var PluginDrawingModels = [
+  "Windowed",
+  "QuickDraw",
+  "CoreGraphics",
+  "OpenGL",
+  "CoreAnimation",
+  "InvalidatingCoreAnimation",
+  "GDI",
+  "X11",
+  "Async Bitmap",
+  "Async DXGI",
+];

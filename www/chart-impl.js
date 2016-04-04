@@ -520,6 +520,16 @@ ChartDisplay.prototype.buildChipsetSeries = function (aData, threshold)
   return this.aggToSeries(data);
 }
 
+ChartDisplay.prototype.buildGenSeries = function (aData, threshold)
+{
+  var data = this.mapToKeyedAgg(aData,
+    function (key) { return DeviceKeyToPropKey(key, 'gen'); },
+    function (key) { return DeviceKeyToPropLabel(key, 'gen'); }
+  );
+  data = this.reduceAgg(data, threshold, 'other', 'Other');
+  return this.aggToSeries(data);
+}
+
 ChartDisplay.prototype.buildDriverSeries = function (aData, threshold)
 {
   var data = this.mapToKeyedAgg(aData,

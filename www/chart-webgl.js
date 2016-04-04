@@ -67,4 +67,10 @@ ChartDisplay.prototype.drawWebGL = function(version)
     name + ' Failures, by Device Driver',
     600, 300);
   this.drawPieChart(elt, this.buildDriverSeries(obj.failures.drivers, 0.01));
+
+  var elt = this.prepareChartDiv(
+    version + '-fail-by-gen',
+    name + ' Failures, by Generation',
+    600, 300);
+  this.drawPieChart(elt, this.buildGenSeries(obj.failures.devices, 0.01));
 }

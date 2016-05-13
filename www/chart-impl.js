@@ -98,6 +98,11 @@ ChartDisplay.prototype.drawChart = function (type, elt, data, aOptions)
       fill: true,
       lineWidth: 0,
       fillColor: 'rgb(155,200,123)',
+      numbers: {
+        show: function (n) {
+          return n.toFixed(2) + '%';
+        },
+      },
     };
 
     var ticks = [];

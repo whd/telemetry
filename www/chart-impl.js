@@ -1,5 +1,5 @@
 // vim: set ts=2 sw=2 tw=99 et:
-var USE_S3_FOR_CHART_DATA = true;
+var USE_S3_FOR_CHART_DATA = false;
 
 // These are files that may not be in S3 yet since the analysis is new. Once
 // they're here, they should be removed from this map.
@@ -332,9 +332,10 @@ ChartDisplay.prototype.ensureData = function (key, callback)
 
 // Collapse a map of (key -> amount) based on a key transform, then collapse
 // small values based on a threshold.
-CD.CollapseMap = function (data, total, threshold, keyFn)
+CD.CollapseMap = function (data, total, threshold, aKeyFn)
 {
   var computed_total = 0;
+  var keyFn = aKeyFn || function (key) { return key; };
 
   // New map based on key transform.
   var newData = {};

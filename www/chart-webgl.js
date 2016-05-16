@@ -74,3 +74,36 @@ ChartDisplay.prototype.drawWebGL = function(version)
     600, 300);
   this.drawPieChart(elt, this.buildGenSeries(obj.failures.devices, 0.01));
 }
+
+ChartDisplay.prototype.drawGLFailures = function ()
+{
+  var obj = this.ensureData('webgl-statistics.json', this.drawGLFailures.bind(this));
+  if (!obj)
+    return;
+
+  this.drawSampleInfo(obj);
+
+  var infoText = 'Note: these statistics are currently only collected on Nightly, ' +
+                 'Firefox 49+, so the sample size is quite small compared to the ' +
+                 'overall population.';
+
+  $('#viewport').append(
+    $("<p></p>").append(
+      $("<span></span>").text(infoText)
+    )
+  );
+
+  var elt = this.prepareChartDiv(
+    'gl-fail-webgl',
+    'WebGL Failure Codes',
+    600, 300);
+  var map = CD.CollapseMap(obj.general.webgl.status, undefined, 0.003);
+  this.drawPieChart(elt, this.mapToSeries(map));
+
+  var elt = this.prepareChartDiv(
+    'gl-fail-opengl',
+    'OpenGL Failure Codes',
+    600, 300);
+  var map = CD.CollapseMap(obj.general.opengl.status, undefined, 0.003);
+  this.drawPieChart(elt, this.mapToSeries(map));
+}

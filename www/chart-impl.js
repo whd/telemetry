@@ -1,5 +1,5 @@
 // vim: set ts=2 sw=2 tw=99 et:
-var USE_S3_FOR_CHART_DATA = false;
+var USE_S3_FOR_CHART_DATA = true;
 
 // These are files that may not be in S3 yet since the analysis is new. Once
 // they're here, they should be removed from this map.

@@ -323,9 +323,7 @@ ChartDisplay.prototype.ensureDataImpl = function (key, callback, useS3)
 
 ChartDisplay.prototype.ensureData = function (key, callback)
 {
-  // :TODO: trend data is not yet automated.
-  var useS3 = (USE_S3_FOR_CHART_DATA &&
-               (key.substr(0, 6) != 'trend-'));
+  var useS3 = USE_S3_FOR_CHART_DATA;
 
   return this.ensureDataImpl(key, callback, useS3);
 }

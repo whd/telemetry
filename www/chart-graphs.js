@@ -149,14 +149,14 @@ ChartDisplay.prototype.drawMonitors = function ()
 
   this.drawSampleInfo(obj);
 
-  var counts = this.reduce(obj.counts, 'Other', 0.005);
+  var counts = this.reduce(obj.counts, 'Other', 0.001);
   var refreshRates = this.reduce(obj.refreshRates, 'Other', 0.01);
   var resolutions = this.reduce(obj.resolutions, 'Other', 0.01);
 
   var largest_width = 0;
   var largest_height = 0;
   var largest_total = 0, largest_total_str;
-  for (var resolution in resolutions) {
+  for (var resolution in obj.resolutions) {
     var tuple = resolution.split('x');
     if (tuple.length != 2)
       continue;

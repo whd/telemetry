@@ -309,6 +309,16 @@ ChartDisplay.prototype.drawWindowsFeatures = function ()
   this.drawPieChart(elt, series);
 
   var elt = this.prepareChartDiv(
+    'windows-media-decoder-backends',
+    'Media Decoder Backends Used',
+    600, 300);
+  var series = this.listToSeries(source.media_decoders,
+    function (index) {
+      return MediaDecoderBackends[index];
+    });
+  this.drawPieChart(elt, series, { unitName: "instances" });
+
+  var elt = this.prepareChartDiv(
     'windows-plugin-drawing-models',
     'Plugin Drawing Modes Used',
     600, 300);
@@ -319,7 +329,7 @@ ChartDisplay.prototype.drawWindowsFeatures = function ()
   for (var i = 1; i < source.plugin_models.length; i++)
     map.Windowless += source.plugin_models[i];
   var series = this.mapToSeries(map);
-  this.drawPieChart(elt, series);
+  this.drawPieChart(elt, series, { unitName: "instances" });
 
   var elt = this.prepareChartDiv(
     'windows-windowless-plugin-drawing-models',
@@ -328,7 +338,7 @@ ChartDisplay.prototype.drawWindowsFeatures = function ()
   var series = this.listToSeries(source.plugin_models.slice(1), function (index) {
     return PluginDrawingModels[index + 1];
   });
-  this.drawPieChart(elt, series);
+  this.drawPieChart(elt, series, { unitName: "instances" });
 
   var elt = this.prepareChartDiv(
     'texture-sharing-breakdown',

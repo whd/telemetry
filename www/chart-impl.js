@@ -154,7 +154,7 @@ ChartDisplay.prototype.bindHoverDraw = function (elt, callback)
   }).bind(this));
 }
 
-ChartDisplay.prototype.drawPieChart = function(elt, data)
+ChartDisplay.prototype.drawPieChart = function(elt, data, extraOptions)
 {
   data.sort(function(a, b) {
     return b.data - a.data;
@@ -165,6 +165,12 @@ ChartDisplay.prototype.drawPieChart = function(elt, data)
     total += data[i].data;
   for (var i = 0; i < data.length; i++)
     percentages[data[i].label] = ((data[i].data / total) * 100).toFixed(1);
+
+  var unitName = "sessions";
+  if (extraOptions) {
+    if (extraOptions.unitName)
+      unitName = extraOptions.unitName;
+  }
 
   var options = {
     series: {
@@ -200,7 +206,7 @@ ChartDisplay.prototype.drawPieChart = function(elt, data)
     }
 
     var label = data[obj.seriesIndex].label;
-    var text = label + " - " + percentages[label] + "% (" + data[obj.seriesIndex].data + " sessions)";
+    var text = label + " - " + percentages[label] + "% (" + data[obj.seriesIndex].data + " " + unitName + ")";
 
     this.activeHover = new ToolTip(event.target, obj.seriesIndex, text);
     this.activeHover.draw(pos.pageX, pos.pageY);

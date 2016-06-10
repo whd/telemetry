@@ -337,3 +337,9 @@ var PluginDrawingModels = [
   "Async Bitmap",
   "Async DXGI",
 ];
+
+var MediaDecoderBackends = [
+  "WMF Software",
+  "DXVA D3D9",
+  "DXVA D3D11",
+];

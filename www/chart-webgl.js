@@ -87,23 +87,33 @@ ChartDisplay.prototype.drawGLFailures = function ()
                  'Firefox 49+, so the sample size is quite small compared to the ' +
                  'overall population.';
 
+  var webgl = obj.general.webgl;
+  var successCount = webgl.status.SUCCESS | 0;
+
+  var instanceCount = 0;
+  for (var key in webgl.status)
+    instanceCount += webgl.status[key];
+  var failureCount = instanceCount - successCount;
+  var instanceRate = CD.ToPercent(failureCount / instanceCount);
+
+  var statusText = instanceCount + " instances total; " +
+                   instanceRate + "% (" + failureCount + ") failed.";
+
   $('#viewport').append(
     $("<p></p>").append(
       $("<span></span>").text(infoText)
+    ),
+    $("<p></p>").append(
+      $("<strong></strong>").text(statusText)
     )
   );
+
+  var failureMap = CD.TrimMap(webgl.status, 'SUCCESS');
 
   var elt = this.prepareChartDiv(
     'gl-fail-webgl',
     'WebGL Failure Codes',
     600, 300);
-  var map = CD.CollapseMap(obj.general.webgl.status, undefined, 0.003);
-  this.drawPieChart(elt, this.mapToSeries(map));
-
-  var elt = this.prepareChartDiv(
-    'gl-fail-opengl',
-    'OpenGL Failure Codes',
-    600, 300);
-  var map = CD.CollapseMap(obj.general.opengl.status, undefined, 0.003);
-  this.drawPieChart(elt, this.mapToSeries(map));
+  var map = CD.CollapseMap(failureMap, undefined, 0.0003);
+  this.drawPieChart(elt, this.mapToSeries(map), { unitName: "instances" });
 }

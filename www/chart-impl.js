@@ -334,6 +334,30 @@ ChartDisplay.prototype.ensureData = function (key, callback)
   return this.ensureDataImpl(key, callback, useS3);
 }
 
+// Format a fraction as a percentage, sans-percent sign.
+CD.ToPercent = function (val)
+{
+  return parseFloat((val * 100).toFixed(2));
+}
+
+// Copy an array.
+CD.CopyMap = function (data)
+{
+  var newData = {};
+  for (var key in data)
+    newData[key] = data[key];
+  return newData;
+}
+
+// Copy an array, deleting any of the specified keys.
+CD.TrimMap = function (data/*, ... */)
+{
+  var copy = CD.CopyMap(data);
+  for (var i = 1; i < arguments.length; i++)
+    delete copy[arguments[i]];
+  return copy;
+}
+
 // Collapse a map of (key -> amount) based on a key transform, then collapse
 // small values based on a threshold.
 CD.CollapseMap = function (data, total, threshold, aKeyFn)
@@ -495,7 +519,7 @@ ChartDisplay.prototype.mapToSeries = function (input, namer)
 
 ChartDisplay.prototype.toPercent = function (val)
 {
-  return parseFloat((val * 100).toFixed(2));
+  return CD.ToPercent(val);
 }
 
 // :TODO: Transition previous OS-mapping callers to this function.

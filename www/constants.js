@@ -245,6 +245,7 @@ var OSXNameMap = {
   '10.9': 'Mavericks',
   '10.10': 'Yosemite',
   '10.11': 'El Capitan',
+  '10.12': 'Sierra',
 };
 
 function DarwinVersionToOSX(darwin_version)

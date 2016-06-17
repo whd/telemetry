@@ -74,14 +74,14 @@ function MacVersionName(version)
 {
   var parts = version.split('.');
   if (parts.length < 2)
-    return 'Mac OS X Unknown';
+    return 'macOS Unknown';
 
   var key = parts[0] + '.' + parts[1];
   var osx_version = DarwinVersionToOSX(version);
   if (osx_version in OSXNameMap)
-    return 'OS X ' + OSXNameMap[osx_version];
+    return 'macOS ' + OSXNameMap[osx_version];
 
-  return 'Mac OS X ' + osx_version;
+  return 'macOS ' + osx_version;
 }
 
 var ImportantWindowsVersions = {

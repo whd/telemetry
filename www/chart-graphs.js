@@ -50,7 +50,7 @@ ChartDisplay.prototype.drawGeneral = function ()
   this.drawPieChart(elt, [
       { label: "Windows", data: parseInt(subset.os['Windows']) },
       { label: "Linux", data: parseInt(subset.os['Linux']) },
-      { label: "OS X", data: parseInt(subset.os['Darwin']) },
+      { label: "macOS", data: parseInt(subset.os['Darwin']) },
   ]);
 
   if (filter.val() == 'all') {
@@ -786,13 +786,13 @@ ChartDisplay.prototype.drawMacStats = function ()
 
   var elt = this.prepareChartDiv(
     'osx-versions',
-    'OS X Versions',
+    'macOS Versions',
     600, 300);
 
   var mac_versions = this.mapToKeyedAgg(obj.versions,
     DarwinVersionToOSX,
     function (old_key, new_key) {
-      return 'OS X ' + new_key + ' (' + OSXNameMap[new_key] + ')';
+      return 'macOS ' + new_key + ' (' + OSXNameMap[new_key] + ')';
     }
   );
   this.drawPieChart(elt, this.aggToSeries(mac_versions));
@@ -825,7 +825,7 @@ ChartDisplay.prototype.drawMacStats = function ()
     var osx_version = '10.' + i;
     var elt = this.prepareChartDiv(
       'osx-' + osx_version,
-      'OS X ' + osx_version + ' (' + OSXNameMap[osx_version] + ') - Breakdown',
+      'macOS ' + osx_version + ' (' + OSXNameMap[osx_version] + ') - Breakdown',
       600, 300);
 
     var new_map = {};

@@ -83,9 +83,13 @@ ChartDisplay.prototype.drawGLFailures = function ()
 
   this.drawSampleInfo(obj);
 
-  var infoText = 'Note: these statistics are currently only collected on Nightly, ' +
+  var noteText = 'Note: these statistics are currently only collected on Nightly, ' +
                  'Firefox 49+, so the sample size is quite small compared to the ' +
                  'overall population.';
+
+  var infoText = 'These failure IDs report why the user is not getting any WebGL.' +
+                 'If we try to fallback to a software fallback it will report the ' +
+                 'latest most relevant failure.';
 
   var webgl = obj.general.webgl;
   var successCount = webgl.status.SUCCESS | 0;
@@ -116,4 +120,23 @@ ChartDisplay.prototype.drawGLFailures = function ()
     600, 300);
   var map = CD.CollapseMap(failureMap, undefined, 0.0003);
   this.drawPieChart(elt, this.mapToSeries(map), { unitName: "instances" });
+
+  var acclInfoText = 'The acceleration failure ID reports the failure that lead us ' +
+                     'to give up creating an HW accelerated WebGL context. It may ' +
+                     'or may not fallback properly to a software context.';
+
+  $('#viewport').append(
+    $("<p></p>").append(
+      $("<span></span>").text(acclInfoText)
+    )
+  );
+
+  var acclFailureMap = CD.TrimMap(webgl.acceleration_status, 'SUCCESS');
+
+  var elt = this.prepareChartDiv(
+    'gl-fail-webgl',
+    'WebGL Acceleration Failure Codes',
+    600, 300);
+  var acclMap = CD.CollapseMap(acclFailureMap, undefined, 0.0003);
+  this.drawPieChart(elt, this.mapToSeries(acclMap), { unitName: "instances" });
 }

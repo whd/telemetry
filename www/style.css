@@ -23,3 +23,9 @@ a:hover {
   padding:.25em;
   position:absolute;
 }
+
+iframe {
+  box-sizing: border-box;
+  width: 100%;
+  height: 1000px;
+}

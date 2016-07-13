@@ -198,6 +198,7 @@ Controller.prototype.getParam = function (key, defaultValue)
 }
 
 Controller.prototype.displayHardwarePivot = function ()
+{
   $('#viewport').append(
     $('<p></p>').text(
       'The following are just convenient iframes to our SQL Telemtry store to pivot on our hardware data. You will need to login and reload the page to see this data.'
@@ -220,7 +221,6 @@ Controller.prototype.displayHardwarePivot = function ()
     ),
     $('<iframe src="https://sql.telemetry.mozilla.org/queries/670#1133">')
   );
-{
 }
 
 Controller.prototype.displayAbout = function ()

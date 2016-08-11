@@ -180,8 +180,8 @@ Controller.prototype.changeView = function (view)
     case 'webgl2':
       this.charts.drawWebGL(this.view);
       break;
-    case 'glfail':
-      this.charts.drawGLFailures();
+    case 'failure-ids':
+      this.charts.drawFailureIds();
       break;
     case 'about':
       this.displayAbout();

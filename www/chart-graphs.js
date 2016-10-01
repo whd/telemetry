@@ -277,6 +277,22 @@ ChartDisplay.prototype.drawWindowsFeatures = function ()
     });
   this.drawPieChart(elt, series);
 
+  $('#viewport').append(
+    $('<p></p>').append(
+      $('<span></span>').text('Note: content backend information is Firefox 51+ only.')
+    )
+  );
+
+  var elt = this.prepareChartDiv(
+    'content_backends',
+    'Content Backends',
+    600, 300);
+  var series = this.mapToSeries(source.content_backends,
+    function (key) {
+      return key;
+    });
+  this.drawPieChart(elt, series);
+
   // Everything else is Windows Vista+.
   if (!('d3d11' in source))
     return;

@@ -335,6 +335,17 @@ ChartDisplay.prototype.drawWindowsFeatures = function ()
   this.drawPieChart(elt, series, { unitName: "instances" });
 
   var elt = this.prepareChartDiv(
+    'windows-gpu-process',
+    'GPU Process Status (Firefox 53+)',
+    600, 300);
+  var series = this.mapToSeries(
+    CD.TrimMap(source.gpu_process, 'none'),
+    function (key) {
+      return key;
+    });
+  this.drawPieChart(elt, series);
+
+  var elt = this.prepareChartDiv(
     'windows-plugin-drawing-models',
     'Plugin Drawing Modes Used',
     600, 300);

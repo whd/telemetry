@@ -12,10 +12,6 @@ ChartDisplay.prototype.drawFailureIds = function ()
 
   this.drawSampleInfo(webglObj);
 
-  var noteText = 'Note: these statistics are currently only collected on Nightly, ' +
-                 'Firefox 49+, so the sample size is quite small compared to the ' +
-                 'overall population.';
-
   var infoText = 'These failure IDs report why the user is not getting any WebGL.' +
                  'If we try to fallback to a software fallback it will report the ' +
                  'latest most relevant failure.';
@@ -82,8 +78,6 @@ ChartDisplay.prototype.drawFailureIds = function ()
   );
   // Compositor failures
 
-  this.drawSampleInfo(layersObj);
-  this.featureFailureIds(layersObj.general.layers.d3d9, 'd3d9-fail', 'D3D9 Compositor Failure Codes');
   this.featureFailureIds(layersObj.general.layers.d3d11, 'd3d11-fail', 'D3D11 Compositor Failure Codes');
   this.featureFailureIds(layersObj.general.layers.opengl, 'ogl-fail', 'OGL Compositor Failure Codes');
 }

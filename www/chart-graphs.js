@@ -9,11 +9,6 @@ ChartDisplay.prototype.drawGeneral = function ()
   if ('all' in obj) {
     obj.byFx = {};
     obj.byFx['all'] = obj.all;
-    obj.byFx['39'] = obj['39'];
-    obj.byFx['40'] = obj['40'];
-    obj.byFx['41'] = obj['41'];
-    obj.byFx['42'] = obj['42'];
-    obj.byFx['43'] = obj['43'];
   }
 
   var options = this.createOptionList(obj.byFx, function (key) {
@@ -277,12 +272,6 @@ ChartDisplay.prototype.drawWindowsFeatures = function ()
     });
   this.drawPieChart(elt, series);
 
-  $('#viewport').append(
-    $('<p></p>').append(
-      $('<span></span>').text('Note: content backend information is Firefox 51+ only.')
-    )
-  );
-
   var elt = this.prepareChartDiv(
     'content_backends',
     'Content Backends',
@@ -491,25 +480,7 @@ ChartDisplay.prototype.drawSanityTests = function ()
   if (!obj)
     return;
 
-  var optionMap = {
-    'vista': 'Windows Vista+',
-    'xp': 'Windows XP',
-  };
-  var options = this.createOptionList(optionMap, function (key) {
-    return optionMap[key];
-  });
-  var filter = this.app.addFilter(
-    'category',
-    'OS Category',
-    options,
-    this.app.refresh.bind(this.app),
-    'vista');
-
-  var subset;
-  if (filter.val() == 'xp')
-    subset = obj.windowsXP;
-  else
-    subset = obj.windows;
+  var subset = obj.windows;
 
   this.drawSampleInfo(obj);
 

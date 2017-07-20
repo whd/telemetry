@@ -11,18 +11,11 @@ ChartDisplay.prototype.drawWebGL = function(version)
   // Per-version data is under 'webgl1' or 'webgl2'.
   obj = obj[version];
 
-  var infoText = 'Note: these statistics are currently only collected on Nightly, ' +
-                 'Firefox 48, so the sample size is quite small compared to the ' +
-                 'overall population.';
-
   var name = (version == 'webgl1') ? 'WebGL 1' : 'WebGL 2';
   var sampleText = 'Number of sessions with ' + name + ' attempts: ' +
                    (obj.successes.count + obj.failures.count);
 
   $('#viewport').append(
-    $("<p></p>").append(
-      $("<span></span>").text(infoText)
-    ),
     $("<p></p>").append(
       $("<strong></strong>").text(sampleText)
     )

@@ -161,9 +161,6 @@ Controller.prototype.changeView = function (view)
     case 'hwsearch':
       this.charts.displayHardwareSearch();
       break;
-    case 'hwpivot':
-      this.displayHardwarePivot();
-      break;
     case 'system':
       this.charts.drawSystem();
       break;
@@ -195,32 +192,6 @@ Controller.prototype.getParam = function (key, defaultValue)
   if (key in this.queryParams)
     return this.queryParams[key];
   return defaultValue;
-}
-
-Controller.prototype.displayHardwarePivot = function ()
-{
-  $('#viewport').append(
-    $('<p></p>').text(
-      'The following are just convenient iframes to our SQL Telemtry store to pivot on our hardware data. You will need to login and reload the page to see this data.'
-    ),
-    $('<p></p>').text(
-      'This page may take several minutes to generate.'
-    ),
-    $('<h2></h2>').text(
-      'Intel Population'
-    ),
-    $('<iframe src="https://sql.telemetry.mozilla.org/queries/671#1135">'),
-
-    $('<h2></h2>').text(
-      'NVIDIA Population'
-    ),
-    $('<iframe src="https://sql.telemetry.mozilla.org/queries/651#1131">'),
-
-    $('<h2></h2>').text(
-      'AMD Population'
-    ),
-    $('<iframe src="https://sql.telemetry.mozilla.org/queries/670#1133">')
-  );
 }
 
 Controller.prototype.displayAbout = function ()

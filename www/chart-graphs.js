@@ -449,26 +449,30 @@ ChartDisplay.prototype.drawStartupData = function ()
 
   this.drawSampleInfo(obj);
 
-  var sanityTestInfoText =
-    obj.startupTestPings + " (" +
-    this.toPercent(obj.startupTestPings / obj.sessions.count) + "% " +
+  // Since most sessions are "Ok", we zap that from the results.
+  var items = obj.results.splice(1);
+
+  var startupTestFailed = obj.startupTestPings - obj.results[0];
+  var startupTestFailedText =
+    startupTestFailed + " (" +
+    this.toPercent(startupTestFailed / obj.startupTestPings) + "% " +
     "of sessions)";
 
   $("#viewport").append(
       $("<p></p>").append(
-        $("<strong></strong>").text("Number of sessions with startup guards: ")
+        $("<strong></strong>").text("Number of sessions with a startup guard status change: ")
       ).append(
-        $("<span></span>").text(sanityTestInfoText)
+        $("<span></span>").text(startupTestFailedText)
       )
   );
 
   var elt = this.prepareChartDiv(
     'startup-test-results',
-    'Sanity test results',
+    'Status-change breakdown of startup guards',
     600, 300);
-  var series = this.listToSeries(obj.results,
+  var series = this.listToSeries(items,
     function (index) {
-      return StartupTestCode[index];
+      return StartupTestCode[index + 1];
     }
   );
   this.drawPieChart(elt, series);

@@ -272,6 +272,23 @@ ChartDisplay.prototype.drawWindowsFeatures = function ()
     });
   this.drawPieChart(elt, series);
 
+  $('#viewport').append(
+    $("<p></p>").append(
+      $("<strong></strong>").text('Note: Advanced Layers data is Firefox 56+ only')
+    )
+  );
+
+  var advanced_layers = CD.TrimMap(source.advanced_layers, 'none');
+  var elt = this.prepareChartDiv(
+    'advanced_layers',
+    'Advanced Layers',
+    600, 300);
+  var series = this.mapToSeries(advanced_layers,
+    function (key) {
+      return key;
+    });
+  this.drawPieChart(elt, series);
+
   var elt = this.prepareChartDiv(
     'content_backends',
     'Content Backends',

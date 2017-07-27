@@ -178,8 +178,7 @@ var SanityTestCode = [
   "Render failed",
   "Video failed",
   "Crashed",
-  null,
-  "Timed out",
+  "Timed out"
 ];
 var StartupTestCode = [
   "Ok",

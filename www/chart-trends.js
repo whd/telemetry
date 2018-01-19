@@ -99,23 +99,23 @@ ChartDisplay.prototype.plotPercentageTrend = function (elt, points, options)
 ChartDisplay.prototype.drawTrends = function ()
 {
   this.prefetch([
-    'trend-firefox.json',
-    'trend-windows-versions.json',
-    'trend-windows-compositors.json',
-    'trend-windows-arch.json',
-    'trend-windows-d3d11.json',
-    'trend-windows-d2d.json',
-    'trend-windows-vendors.json',
-    'trend-windows-device-gen-amd.json',
-    'trend-windows-device-gen-intel.json',
-    'trend-windows-device-gen-nvidia.json',
+    'trend-firefox-v2.json',
+    'trend-windows-versions-v2.json',
+    'trend-windows-compositors-v2.json',
+    'trend-windows-arch-v2.json',
+    'trend-windows-d3d11-v2.json',
+    'trend-windows-d2d-v2.json',
+    'trend-windows-vendors-v2.json',
+    'trend-windows-device-gen-amd-v2.json',
+    'trend-windows-device-gen-intel-v2.json',
+    'trend-windows-device-gen-nvidia-v2.json',
   ]);
 
   var fxversion_elt = this.prepareChartDiv(
     'firefox-versions-trend',
     'Firefox Versions',
     800, 300, 150);
-  this.onFetch('trend-firefox.json', (function (obj) {
+  this.onFetch('trend-firefox-v2.json', (function (obj) {
     this.plotPercentageTrend(fxversion_elt, obj.trend, {
       gfxLabelFn: function (key) {
         return 'Firefox ' + key;
@@ -127,7 +127,7 @@ ChartDisplay.prototype.drawTrends = function ()
     'windows-versions-trend',
     'Windows Versions',
     800, 300, 150);
-  this.onFetch('trend-windows-versions.json', (function (obj) {
+  this.onFetch('trend-windows-versions-v2.json', (function (obj) {
     this.plotPercentageTrend(winver_elt, obj.trend, {
       gfxLabelFn: WindowsVersionName,
       gfxPreprocess: function (point, data) {
@@ -140,7 +140,7 @@ ChartDisplay.prototype.drawTrends = function ()
     'windows-compositors-trend',
     'Windows Compositors',
     800, 300, 150);
-  this.onFetch('trend-windows-compositors.json', (function (obj) {
+  this.onFetch('trend-windows-compositors-v2.json', (function (obj) {
     this.plotPercentageTrend(wincc_elt, obj.trend, {
       gfxLabelFn: function (key) {
         switch (key) {
@@ -159,7 +159,7 @@ ChartDisplay.prototype.drawTrends = function ()
     'windows-arch-trend',
     'Firefox CPU Architecture',
     800, 300, 150);
-  this.onFetch('trend-windows-arch.json', (function (obj) {
+  this.onFetch('trend-windows-arch-v2.json', (function (obj) {
     this.plotPercentageTrend(winarch_elt, obj.trend, {
       gfxLabelFn: function (key) {
         switch (key) {
@@ -176,7 +176,7 @@ ChartDisplay.prototype.drawTrends = function ()
     'd3d11-trend',
     'Direct3D 11 Trends',
     750, 300, 200);
-  this.onFetch('trend-windows-d3d11.json', (function (obj) {
+  this.onFetch('trend-windows-d3d11-v2.json', (function (obj) {
     this.plotPercentageTrend(d3d11_elt, obj.trend, {
       gfxLabelFn: function (key) {
         if (key in D3D11StatusCode)
@@ -207,7 +207,7 @@ ChartDisplay.prototype.drawTrends = function ()
     'd2d-trend',
     'Direct2D Trends',
     800, 300, 150);
-  this.onFetch('trend-windows-d2d.json', (function (obj) {
+  this.onFetch('trend-windows-d2d-v2.json', (function (obj) {
     this.plotPercentageTrend(d2d_elt, obj.trend, {
       gfxLabelFn: function (key) {
         switch (key) {
@@ -233,7 +233,7 @@ ChartDisplay.prototype.drawTrends = function ()
     'windows-vendor-trend',
     'Graphics Vendors, Windows',
     800, 300, 150)
-  this.onFetch('trend-windows-vendors.json', (function (obj) {
+  this.onFetch('trend-windows-vendors-v2.json', (function (obj) {
     this.plotPercentageTrend(winvendor_elt, obj.trend, {
       gfxLabelFn: function (key) {
         if (key == 'other')
@@ -260,7 +260,7 @@ ChartDisplay.prototype.drawTrends = function ()
         'windows-vendor-gen-trend-' + vendor.nick,
         vendor.name + ' Device Generations, Windows',
         800, 300, 150)
-      this.onFetch('trend-windows-device-gen-' + vendor.nick + '.json', (function (obj) {
+      this.onFetch('trend-windows-device-gen-' + vendor.nick + '-v2.json', (function (obj) {
         this.plotPercentageTrend(elt, obj.trend, {});
       }).bind(this));
     }).bind(this))(vendors[i]);

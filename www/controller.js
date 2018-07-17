@@ -208,7 +208,7 @@ Controller.prototype.displayAbout = function ()
     ),
     $('<p></p>').append(
       $('<span></span>').text("Source code: "),
-      $('<a href="https://github.com/dvander/moz-gfx-telemetry">').text("https://github.com/dvander/moz-gfx-telemetry")
+      $('<a href="https://github.com/FirefoxGraphics/moz-gfx-telemetry">').text("https://github.com/FirefoxGraphics/moz-gfx-telemetry")
     )
   );
 }

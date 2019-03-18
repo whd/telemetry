@@ -149,6 +149,7 @@ ChartDisplay.prototype.drawTrends = function ()
           case 'none': return 'None';
           case 'd3d9': return 'Direct3D 9';
           case 'opengl': return 'OpenGL';
+          case 'webrender': return 'WebRender';
         }
         return 'Unknown';
       }

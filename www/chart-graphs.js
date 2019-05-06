@@ -869,18 +869,27 @@ ChartDisplay.prototype.drawLinuxStats = function ()
   this.drawSampleInfo(obj);
 
   var elt = this.prepareChartDiv(
+    'compositors',
+    'Compositor Usage',
+    600, 300);
+  var series = this.mapToSeries(obj.compositors,
+    function (key) {
+      return key;
+    });
+  this.drawPieChart(elt, series);
+
+  var elt = this.prepareChartDiv(
     'driver-vendors',
     'Driver Vendors',
     600, 300);
-
-  var driver_vendors = this.mapToSeries(obj.driverVendors,
+  var series = this.mapToSeries(obj.driverVendors,
     function (key) {
       if (key == '')
         return 'unknown';
       return key;
     }
   );
-  this.drawPieChart(elt, driver_vendors);
+  this.drawPieChart(elt, series);
 }
 
 ChartDisplay.prototype.displayHardwareSearch = function() {

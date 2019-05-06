@@ -860,6 +860,27 @@ ChartDisplay.prototype.drawMacStats = function ()
   }
 }
 
+ChartDisplay.prototype.drawLinuxStats = function ()
+{
+  var obj = this.ensureData('linux-statistics.json', this.drawLinuxStats.bind(this));
+  if (!obj)
+    return;
+
+  this.drawSampleInfo(obj);
+
+  var elt = this.prepareChartDiv(
+    'driver-vendors',
+    'Driver Vendors',
+    600, 300);
+
+  var driver_vendors = this.mapToSeries(obj.driverVendors,
+    function (key) {
+      return key;
+    }
+  );
+  this.drawPieChart(elt, driver_vendors);
+}
+
 ChartDisplay.prototype.displayHardwareSearch = function() {
   var detail = this.ensureData('device-statistics.json', this.displayHardwareSearch.bind(this));
   if (!detail)

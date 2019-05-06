@@ -875,6 +875,8 @@ ChartDisplay.prototype.drawLinuxStats = function ()
 
   var driver_vendors = this.mapToSeries(obj.driverVendors,
     function (key) {
+      if (key == '')
+        return 'unknown';
       return key;
     }
   );

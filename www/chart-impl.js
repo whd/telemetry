@@ -268,7 +268,7 @@ ChartDisplay.prototype.onFetch = function (key, callback)
 ChartDisplay.prototype.makeDataURL = function (name, useS3)
 {
   var prefix = useS3
-               ? 'https://analysis-output.telemetry.mozilla.org/gfx-telemetry/data/'
+               ? 'https://analysis-output.telemetry.mozilla.org/gfx/telemetry-data/'
                : 'data/';
   return prefix + name;
 }
